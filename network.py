@@ -6,15 +6,28 @@ Backward pass: the error is passed back through the layers. That tells us, for e
                weight, which way to nudge it to make the error smaller. That direction
                is the weight's slope.
 Training step: nudge every weight a little, against its slope.
+
+With predicts_noise, the network also guesses how scattered each result is (its variance),
+and it is trained on a loss that makes a miss cost less where it expects scatter. Then it
+has no reason to chase a toy's random results: it can say "this one is noisy" instead.
 """
 
 import copy
 
 import numpy as np
 
+LOG_VARIANCE_RANGE = (-6.0, 3.0)  # the guessed log-variance is kept inside this range
+
 
 class Network:
-    def __init__(self, rng, sizes=(12, 128, 128, 128, 3), learning_rate=1e-3):
+    def __init__(self, rng, sizes=(12, 128, 128, 128, 3), learning_rate=1e-3, predicts_noise=False):
+        # With predicts_noise, the last layer gives two numbers per result: the guess, and the
+        # log of how scattered the network expects that result to be.
+        self.result_size = sizes[-1]
+        self.predicts_noise = predicts_noise
+        if predicts_noise:
+            sizes = (*sizes[:-1], 2 * sizes[-1])
+
         # One table of weights and one list of biases per layer.
         self.weights = [
             rng.normal(0, np.sqrt(2 / size_in), (size_in, size_out))
@@ -29,9 +42,15 @@ class Network:
         self._steps_taken = 0
 
     def predict(self, inputs):
-        """The forward pass on its own."""
-        _, predictions = self._forward(inputs)
-        return predictions
+        """The forward pass on its own: the network's guess for each result."""
+        _, outputs = self._forward(inputs)
+        return outputs[:, :self.result_size]
+
+    def predicted_noise(self, inputs):
+        """How scattered the network expects each result to be (its variance). Needs predicts_noise."""
+        _, outputs = self._forward(inputs)
+        log_variance, _ = self._log_variance(outputs)
+        return np.exp(log_variance)
 
     def features(self, inputs):
         """What the last hidden layer makes of the inputs. The critic in step 2 reads these."""
@@ -41,7 +60,7 @@ class Network:
     def backward(self, inputs, targets):
         """Forward pass, then pass the error back through the layers.
 
-        Returns the predictions and, for every layer, two things per example:
+        Returns the guesses and, for every layer, two things per example:
 
             layer_inputs[k]   what went into layer k
             layer_errors[k]   how much the loss changes when layer k's output changes
@@ -49,10 +68,19 @@ class Network:
         Multiply the two and you have that example's slope for layer k's weights.
         Nothing is changed here. This only measures.
         """
-        layer_inputs, predictions = self._forward(inputs)
+        layer_inputs, outputs = self._forward(inputs)
+        guesses = outputs[:, :self.result_size]
 
-        # The loss for one example is its squared miss, summed over the 3 outputs.
-        error = 2 * (predictions - targets)
+        if self.predicts_noise:
+            # The loss for one example, summed over the results: miss² / (2 variance) + log(variance) / 2.
+            # Where the network expects much scatter, a miss costs little, so it stops chasing noise.
+            log_variance, inside = self._log_variance(outputs)
+            variance = np.exp(log_variance)
+            miss = guesses - targets
+            error = np.concatenate([miss / variance, (0.5 - miss**2 / (2 * variance)) * inside], axis=1)
+        else:
+            # The loss for one example is its squared miss, summed over the 3 outputs.
+            error = 2 * (guesses - targets)
         layer_errors = [error]
 
         # Walk back from the last layer to the first.
@@ -61,7 +89,7 @@ class Network:
             error = (error @ self.weights[k].T) * was_switched_on
             layer_errors.insert(0, error)
 
-        return predictions, layer_inputs, layer_errors
+        return guesses, layer_inputs, layer_errors
 
     def train_step(self, inputs, targets):
         """Learn a little from one batch of examples."""
@@ -85,8 +113,14 @@ class Network:
         for weights, biases in zip(self.weights[:-1], self.biases[:-1]):
             switched_on = np.maximum(layer_inputs[-1] @ weights + biases, 0)
             layer_inputs.append(switched_on)
-        predictions = layer_inputs[-1] @ self.weights[-1] + self.biases[-1]
-        return layer_inputs, predictions
+        outputs = layer_inputs[-1] @ self.weights[-1] + self.biases[-1]
+        return layer_inputs, outputs
+
+    def _log_variance(self, outputs):
+        """The guessed log-variance, kept inside LOG_VARIANCE_RANGE, and yes/no per number: was it inside?"""
+        raw = outputs[:, self.result_size:]
+        low, high = LOG_VARIANCE_RANGE
+        return np.clip(raw, low, high), (raw > low) & (raw < high)
 
     def _parameters(self):
         return self.weights + self.biases

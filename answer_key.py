@@ -17,7 +17,7 @@ It is only here to judge the signals.
 
 import numpy as np
 
-from world import OBJECTS, as_inputs, expected_result, push, random_pushes
+from world import OBJECTS, TABLE, as_inputs, push, random_pushes
 
 
 def true_error(network, test_pushes, on_table):
@@ -25,13 +25,13 @@ def true_error(network, test_pushes, on_table):
     return np.nanmean(true_error_per_object(network, test_pushes, on_table))
 
 
-def true_error_per_object(network, test_pushes, on_table):
+def true_error_per_object(network, test_pushes, on_table, world=TABLE):
     """The same error, one number per object. Objects not on the table get a gap (not-a-number)."""
-    miss = network.predict(as_inputs(test_pushes)) - expected_result(test_pushes)
+    miss = network.predict(world.as_inputs(test_pushes)) - world.expected_result(test_pushes)
     error = (miss**2).sum(axis=1)
     return np.array([
         error[test_pushes.obj == obj].mean() if on_table[obj] else np.nan
-        for obj in range(len(OBJECTS))
+        for obj in range(len(world.names))
     ])
 
 
