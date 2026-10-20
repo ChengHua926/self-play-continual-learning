@@ -250,7 +250,7 @@ class GettingWorse:
     def __init__(self):
         self.predictions_made = 0
 
-    def train_step(self, inputs, targets):
+    def train_step(self, inputs, targets, noise=None):
         pass
 
     def predict(self, inputs):

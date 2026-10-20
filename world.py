@@ -129,6 +129,20 @@ class World:
 
         return result
 
+    def in_narrow_part(self, pushes):
+        """yes/no per push: does it land in its object's narrow part?
+
+        The narrow parts are where a narrow world's objects show their behaviour: a box
+        pushed hard, a roller pushed along the way it faces (or straight against it), a
+        spinner hit near its edge. Toys have none. A plain world has the same parts, but
+        nothing special happens in them.
+        """
+        kind = np.asarray(self.kinds)[pushes.obj]
+        along_facing = np.abs(np.sin(pushes.direction - pushes.facing)) <= np.sin(ALIGNED)
+        return (((kind == "box") & (pushes.strength >= STRONG))
+                | ((kind == "roller") & along_facing)
+                | ((kind == "spinner") & (np.abs(pushes.hit_point) >= EDGE)))
+
     def test_pushes(self, count, rng):
         """Pushes for measuring the true error, every object equally often.
 

@@ -42,7 +42,10 @@ memorizes the toy's random results, and 20 steps per round, where it memorizes m
 The map (run_map.py) uses the same run function in bigger and narrow worlds, adds the two
 other labels, progress over time and slope agreement, and can switch on a guard against
 memorizing noise: "early stopping" (see train below) or "predicts its noise" (a network
-that also guesses how scattered each result is, see network.py).
+that also guesses how scattered each result is, see network.py). Step B adds a third guard,
+"noise from repeats": a second network learns how scattered each result is from pushes
+done twice only (see repeat_noise), and the learner's misses cost less where it expects
+scatter.
 
 Run it with:   python3 run_step2.py
 It takes about twenty seconds, writes results/step2.npz, and prints the report. It uses
@@ -58,7 +61,7 @@ import numpy as np
 import report_step2
 from answer_key import true_error_per_object
 from critic import Critic, forecast_agreement, object_average
-from network import Network
+from network import LOG_VARIANCE_RANGE, Network
 from run_step1 import BATCH_SIZE, PAST_SELF_AGE, PUSHES_PER_ROUND, ROUNDS, SEEDS, SHARE, TEST_PUSHES
 from signals import forward_progress, progress_over_time, raw_error, repeat_agreement, slope_agreement
 from world import RESULT_SIZE, TABLE, joined
@@ -93,7 +96,8 @@ def run(learner, train_steps, seed, world=TABLE, share=SHARE, guard="none", budg
     """One learner, one training setting, one seed, in one world.
 
     share says how often each object is picked when pushes are left to chance. guard is
-    one of GUARDS. budget is "fair" or "doubled" (see the top of this file).
+    one of GUARDS, or "noise from repeats" (added in step B, and kept out of GUARDS so that
+    the map stays as it was). budget is "fair" or "doubled" (see the top of this file).
     Returns, for every round: the true error of every object, how many pushes went to every
     object, the number of training steps actually taken, and the critic check (a line over
     the rounds for each name in CRITIC_CHECKS, see check_critic).
@@ -110,8 +114,9 @@ def run(learner, train_steps, seed, world=TABLE, share=SHARE, guard="none", budg
     past_selves = []
     test_pushes = world.test_pushes(TEST_PUSHES, rng)
 
-    # How this learner spends its actions (see the top of this file).
-    if budget == "doubled":
+    # How this learner spends its actions (see the top of this file). The guard "noise from
+    # repeats" needs every push twice: its noise model learns from every pair.
+    if budget == "doubled" or guard == "noise from repeats":
         a_pushes, a_twice, b_pushes, b_twice = EVERY_PUSH_TWICE
     elif learner == "repeat agreement":
         a_pushes, a_twice, b_pushes, b_twice = B_TWICE
@@ -124,6 +129,13 @@ def run(learner, train_steps, seed, world=TABLE, share=SHARE, guard="none", budg
     steps_taken = np.zeros(ROUNDS)
     critic_check = {name: np.full(ROUNDS, np.nan) for name in CRITIC_CHECKS}
     past_grades = []  # (objects, grades) of the rounds the critic remembers, for the critic check
+
+    # The guard "noise from repeats" trains a noise model on pairs: a push, and its scatter judged from its two results.
+    noise_model = None
+    if guard == "noise from repeats":
+        noise_model = Network(rng, sizes=(world.input_size, 128, 128, 128, RESULT_SIZE))
+    pair_inputs = np.zeros((0, world.input_size))
+    pair_noise = np.zeros((0, RESULT_SIZE))
 
     for round_number in range(ROUNDS):
         on_table = world.appears_at <= round_number
@@ -175,7 +187,13 @@ def run(learner, train_steps, seed, world=TABLE, share=SHARE, guard="none", budg
         memory_inputs = np.concatenate([memory_inputs, a_inputs])
         memory_results = np.concatenate([memory_results, a_results])
         validation = (validation_inputs, validation_results) if early_stopping else None
-        steps_taken[round_number] = train(network, memory_inputs, memory_results, train_steps, rng, validation)
+        if noise_model is not None:
+            pair_inputs = np.concatenate([pair_inputs, inputs[half_a]])
+            pair_noise = np.concatenate([pair_noise, repeat_noise(first_results[half_a], second_results[half_a])])
+            train(noise_model, pair_inputs, pair_noise, train_steps, rng)
+        steps_taken[round_number] = train(
+            network, memory_inputs, memory_results, train_steps, rng, validation, noise_model,
+        )
 
         # Forward progress needs the network after training.
         if learner == "forward progress":
@@ -197,6 +215,9 @@ def run(learner, train_steps, seed, world=TABLE, share=SHARE, guard="none", budg
         b_inputs, b_results = records(inputs, first_results, second_all_b, half_b)
         memory_inputs = np.concatenate([memory_inputs, b_inputs])
         memory_results = np.concatenate([memory_results, b_results])
+        if noise_model is not None:
+            pair_inputs = np.concatenate([pair_inputs, inputs_b])
+            pair_noise = np.concatenate([pair_noise, repeat_noise(first_b, second_b)])
 
         true_error[round_number] = true_error_per_object(network, test_pushes, on_table, world)
 
@@ -237,19 +258,23 @@ def check_critic(forecasts, grades, objects, world, past_grades):
     }
 
 
-def train(network, memory_inputs, memory_results, train_steps, rng, validation=None):
+def train(network, memory_inputs, memory_results, train_steps, rng, validation=None, noise_model=None):
     """Train for up to train_steps steps on batches drawn from memory. Returns the steps taken.
 
     validation, if given, is (inputs, results) of pushes that are never trained on. Their
     error is checked every CHECK_EVERY steps, and training stops once it has failed to
     improve PATIENCE checks in a row. This is the standard guard against memorizing,
     called early stopping.
+
+    noise_model, if given, guesses how scattered each result is (see expected_noise). A
+    miss then costs less where more scatter is expected (see Network.backward).
     """
     if validation is not None:
         best, misses = validation_error(network, *validation), 0
     for step in range(1, train_steps + 1):
         replayed = rng.integers(0, len(memory_inputs), BATCH_SIZE)
-        network.train_step(memory_inputs[replayed], memory_results[replayed])
+        noise = None if noise_model is None else expected_noise(noise_model, memory_inputs[replayed])
+        network.train_step(memory_inputs[replayed], memory_results[replayed], noise)
         if validation is not None and step % CHECK_EVERY == 0:
             error = validation_error(network, *validation)
             if error < best:
@@ -259,6 +284,21 @@ def train(network, memory_inputs, memory_results, train_steps, rng, validation=N
                 if misses == PATIENCE:
                     return step
     return train_steps
+
+
+def repeat_noise(first_results, second_results):
+    """How scattered each push's result is, judged from the push done twice: half the squared difference.
+
+    For a push whose result never changes this is exactly 0, however rare or sharp its
+    behaviour. Averaged over many pushes alike, it is the variance of their results.
+    """
+    return (first_results - second_results) ** 2 / 2
+
+
+def expected_noise(noise_model, inputs):
+    """The noise model's guess of each result's variance, never below the smallest variance
+    the noise-predicting network can guess, so that no miss can cost without limit."""
+    return np.maximum(noise_model.predict(inputs), 0) + np.exp(LOG_VARIANCE_RANGE[0])
 
 
 def validation_error(network, inputs, results):

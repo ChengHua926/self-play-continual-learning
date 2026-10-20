@@ -57,7 +57,7 @@ class Network:
         layer_inputs, _ = self._forward(inputs)
         return layer_inputs[-1]
 
-    def backward(self, inputs, targets):
+    def backward(self, inputs, targets, noise=None):
         """Forward pass, then pass the error back through the layers.
 
         Returns the guesses and, for every layer, two things per example:
@@ -67,6 +67,11 @@ class Network:
 
         Multiply the two and you have that example's slope for layer k's weights.
         Nothing is changed here. This only measures.
+
+        noise, if given, is how scattered each result is expected to be (its variance, one
+        number per result). A miss then costs less where more scatter is expected: the loss
+        becomes miss² / (2 noise), as for a network that predicts its noise, but with the
+        noise taken from elsewhere. Only for a network without predicts_noise.
         """
         layer_inputs, outputs = self._forward(inputs)
         guesses = outputs[:, :self.result_size]
@@ -78,22 +83,28 @@ class Network:
             variance = np.exp(log_variance)
             miss = guesses - targets
             error = np.concatenate([miss / variance, (0.5 - miss**2 / (2 * variance)) * inside], axis=1)
+        elif noise is not None:
+            error = (guesses - targets) / noise
         else:
             # The loss for one example is its squared miss, summed over the 3 outputs.
             error = 2 * (guesses - targets)
-        layer_errors = [error]
+        return guesses, layer_inputs, self._pass_back(layer_inputs, error)
 
-        # Walk back from the last layer to the first.
-        for k in range(len(self.weights) - 1, 0, -1):
-            was_switched_on = layer_inputs[k] > 0
-            error = (error @ self.weights[k].T) * was_switched_on
-            layer_errors.insert(0, error)
+    def output_slopes(self, inputs, output):
+        """How one output (not the loss) moves with every weight, per example.
 
-        return guesses, layer_inputs, layer_errors
+        Returned the way backward returns them: what went into each layer, and the error
+        signal that came back to it, with the error set to 1 at the chosen output and 0 at
+        the others.
+        """
+        layer_inputs, outputs = self._forward(inputs)
+        error = np.zeros_like(outputs)
+        error[:, output] = 1
+        return layer_inputs, self._pass_back(layer_inputs, error)
 
-    def train_step(self, inputs, targets):
-        """Learn a little from one batch of examples."""
-        _, layer_inputs, layer_errors = self.backward(inputs, targets)
+    def train_step(self, inputs, targets, noise=None):
+        """Learn a little from one batch of examples. For noise, see backward."""
+        _, layer_inputs, layer_errors = self.backward(inputs, targets, noise)
         count = len(inputs)
 
         # The batch's slope is the average of its examples' slopes.
@@ -115,6 +126,15 @@ class Network:
             layer_inputs.append(switched_on)
         outputs = layer_inputs[-1] @ self.weights[-1] + self.biases[-1]
         return layer_inputs, outputs
+
+    def _pass_back(self, layer_inputs, error):
+        """Walk the error back from the last layer to the first. Returns the error at every layer."""
+        layer_errors = [error]
+        for k in range(len(self.weights) - 1, 0, -1):
+            was_switched_on = layer_inputs[k] > 0
+            error = (error @ self.weights[k].T) * was_switched_on
+            layer_errors.insert(0, error)
+        return layer_errors
 
     def _log_variance(self, outputs):
         """The guessed log-variance, kept inside LOG_VARIANCE_RANGE, and yes/no per number: was it inside?"""
