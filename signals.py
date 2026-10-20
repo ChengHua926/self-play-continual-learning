@@ -148,3 +148,52 @@ def slope_consistency(agreement, similar):
     together = agreement[group[:, :, None], group[:, None, :]].sum(axis=(1, 2))
     apart = agreement[group, group].sum(axis=1)
     return together / apart
+
+
+# Labels added for the toy comparison (run_comparison.py).
+
+def slope_agreement_with_copies(network, inputs, results, copy_inputs, copy_results):
+    """A push's slope times the average slope of its own near copies (world.near_copies).
+
+    copy_inputs holds the same number of copies for every push, one push after the other.
+    """
+    _, layer_inputs, layer_errors = network.backward(inputs, results)
+    _, copy_layer_inputs, copy_layer_errors = network.backward(copy_inputs, copy_results)
+    count = len(inputs)
+    copies = len(copy_inputs) // count
+    total = np.zeros(count)
+    for a, d, copy_a, copy_d in zip(layer_inputs, layer_errors, copy_layer_inputs, copy_layer_errors):
+        copy_a = copy_a.reshape(count, copies, -1)
+        copy_d = copy_d.reshape(count, copies, -1)
+        inputs_alike = np.einsum("ni,nci->nc", a, copy_a) + 1  # the +1 covers the bias weights
+        errors_alike = np.einsum("nj,ncj->nc", d, copy_d)
+        total += (inputs_alike * errors_alike).mean(axis=1)
+    return total
+
+
+def last_layer_repeated(network, inputs, first_results, second_results):
+    """Slope agreement of the same push done twice, with the last layer's slopes only (variant c of b)."""
+    features = network.features(inputs)
+    guesses = network.predict(inputs)
+    first_error, second_error = 2 * (guesses - first_results), 2 * (guesses - second_results)
+    return ((features**2).sum(axis=1) + 1) * (first_error * second_error).sum(axis=1)
+
+
+def teaching_value(agreement, yardstick):
+    """One step of teaching value: a push's slope times the average slope of the yardstick pushes.
+
+    agreement comes from slope_agreements. yardstick is a yes/no per push: the pushes that
+    were left to chance, a random sample of the world. A push is not compared with itself.
+    """
+    others = agreement.copy()
+    np.fill_diagonal(others, 0)            # a push is not compared with itself
+    counts = yardstick.sum() - yardstick   # the yardstick, less the push itself if it is in it
+    return others[:, yardstick].sum(axis=1) / np.maximum(counts, 1)
+
+
+def region_average(values, objects):
+    """Learning progress by region: every push gets the average of the values of its object's pushes."""
+    averaged = np.empty(len(values))
+    for obj in np.unique(objects):
+        averaged[objects == obj] = values[objects == obj].mean()
+    return averaged

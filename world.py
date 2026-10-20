@@ -196,6 +196,22 @@ class World:
         return inputs
 
 
+def near_copies(pushes, nudge, rng, copies):
+    """copies pushes close to each push, one push's copies after the other.
+
+    Each copy has the same object, and every setting moved at random by up to nudge of its
+    range (direction and facing by up to nudge of half a turn, strength and hit point by up
+    to nudge of their span, kept inside their limits).
+    """
+    count = len(pushes) * copies
+    copy = pushes.take(np.repeat(np.arange(len(pushes)), copies))
+    copy.direction = copy.direction + nudge * np.pi * rng.uniform(-1, 1, count)
+    copy.strength = np.clip(copy.strength + nudge * 0.8 * rng.uniform(-1, 1, count), 0.2, 1.0)
+    copy.hit_point = np.clip(copy.hit_point + nudge * 2.0 * rng.uniform(-1, 1, count), -1, 1)
+    copy.facing = copy.facing + nudge * np.pi * rng.uniform(-1, 1, count)
+    return copy
+
+
 def make_world(count, rng, narrow=False):
     """A world of count objects (a multiple of 6), mixed like TABLE.
 

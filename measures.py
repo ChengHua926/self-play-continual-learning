@@ -11,6 +11,8 @@ a push's result would surprise the learner, only that the push is unlike what it
     ensemble disagreement   do five learners, trained on the same memory, disagree here?
     random-network novelty  how badly does a small network, trained to imitate a fixed random
                             network on every push seen, imitate it here?
+    steepness               how much would the guess change if the push were changed a little?
+                            (added for the toy comparison, run_comparison.py)
 """
 
 import numpy as np
@@ -86,3 +88,35 @@ def ensemble_disagreement(members, inputs):
 def random_network_novelty(target, imitator, inputs):
     """How badly the imitator, trained on the pushes seen so far, matches the fixed random target here."""
     return ((imitator.predict(inputs) - target.predict(inputs)) ** 2).sum(axis=1)
+
+
+def steepness(network, inputs, settings_from):
+    """How fast the network's guess changes when the push's settings change a little.
+
+    Nudge one setting of the push (its strength, say) by a tiny amount, and see how much
+    each of the three guessed numbers moves, per unit of nudge. Do that for every setting,
+    square the moves and add them up. The backward pass gives all of these at once and
+    exactly, in the limit of a tiny nudge, with no nudged guesses made.
+
+    settings_from is the column of the inputs where the push's settings start, after the
+    on/off switch of each object: the object itself is not something one can nudge. The
+    settings are read as world.as_inputs writes them: the direction as (cos, sin), the
+    strength, the hit point, and the facing as (cos, sin). Turning an angle a little moves
+    its (cos, sin) along the circle, so the guess moves by -sin times its slope along cos,
+    plus cos times its slope along sin.
+
+    A flat guess has steepness 0, and a toy's best guess is flat: the average of its random
+    moves. But a network that has memorized some of a toy's random results is not flat
+    there. A guess that is learning a jump (a box that only moves when pushed hard) is
+    steep around the jump.
+    """
+    cos_direction, sin_direction, cos_facing, sin_facing = (inputs[:, settings_from + k] for k in (0, 1, 4, 5))
+    total = np.zeros(len(inputs))
+    for output in range(network.result_size):
+        _, layer_errors = network.output_slopes(inputs, output)
+        slopes = (layer_errors[0] @ network.weights[0].T)[:, settings_from:]  # how the guess moves with each input
+        direction = -sin_direction * slopes[:, 0] + cos_direction * slopes[:, 1]
+        facing = -sin_facing * slopes[:, 4] + cos_facing * slopes[:, 5]
+        strength, hit_point = slopes[:, 2], slopes[:, 3]
+        total += direction**2 + strength**2 + hit_point**2 + facing**2
+    return total

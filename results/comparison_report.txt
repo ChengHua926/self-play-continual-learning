@@ -1,0 +1,51 @@
+Pushes saved: how many fewer pushes a learner needs to get down to the error not choosing ends at,
+measured on all the learnable objects. never: it does not get there in 70 rounds. *: at the cap, the most
+this can show. End error: against not choosing's, negative is better. Beats do-nothing, beats not
+choosing: in how many of the 10 runs it ends lower. Toys: share of its pushes on toys (1 in 6 objects).
+A learner marked + works by the reading rules.
+
+                                                pushes saved                       end error              beats do-nothing  beats not choosing  toys
+                                            n6     n24       6      24        n6     n24       6      24        n6     n24          n6     n24
+our bets
+    steepness                            never   never   never   never      +12%    +11%    +63%    +31%      3/10    2/10        3/10    1/10   13%
+    raw error x steepness                 +10%   never   never   never      -10%     +3%    +21%    +24%      8/10    6/10        7/10    4/10   34%
+  + repeat agreement x steepness          +14%    +13%   never     +0%      -15%     -8%     +3%     -0%     10/10    9/10       10/10    9/10   15%
+  + disagreement x steepness              +24%    +21%     +4%    +14%      -22%    -12%     -8%    -16%      8/10   10/10        8/10    9/10   25%
+bar to beat
+    raw error                            never   never   never   never      +10%    +23%    +89%   +130%      5/10    1/10        4/10    1/10   63%
+  + repeat agreement                      +19%    +11%   never   never      -21%     -7%     +8%    +10%      9/10   10/10       10/10    8/10   26%
+  + ensemble disagreement                 +27%    +27%   never     +3%      -23%    -13%     +2%     -5%      9/10   10/10       10/10   10/10   39%
+  + random-network novelty                +17%    +10%    +10%     +3%      -12%     -3%     -7%     -6%      9/10    9/10        7/10    5/10   17%
+  + feature novelty                       +30%    +31%    +14%    +19%      -24%    -17%    -16%    -23%     10/10   10/10       10/10   10/10   26%
+  + pinned weights                        +19%    +23%   never   never      -15%    -10%    +11%    +10%      9/10   10/10        9/10   10/10   28%
+baselines
+  + not choosing                           +0%     +0%     +0%     +0%       +0%     +0%     +0%     +0%      7/10    8/10        0/10    0/10   17%
+    do-nothing critic                    never   never   never   never       +3%     +6%    +17%    +20%         -       -        3/10    2/10   19%
+bookkeeping
+  + slope, same push twice                +17%     +7%   never   never      -20%     -6%     +9%     +8%     10/10    9/10        9/10    8/10   24%
+  + slope, same push twice, last layer    +20%     +7%   never   never      -23%     -5%     +3%    +10%     10/10    9/10        9/10    6/10   24%
+    near copies 2%                         +3%   never   never   never       -2%     +8%    +22%    +34%      6/10    4/10        5/10    2/10   22%
+  + forward progress                       +7%   never   never   never       -7%     +1%    +14%     +8%      8/10    7/10        7/10    3/10   26%
+  + progress over 3 rounds                +10%     +3%   never     +0%       -9%     -3%     +3%     -2%      8/10    9/10        8/10    7/10   24%
+  + progress over 10 rounds               +16%    +14%     +3%     +4%      -14%     -9%     -4%     -9%     10/10   10/10       10/10    9/10   21%
+  + progress, new first                   +17%     +6%     +1%     +7%      -14%     -4%     -2%     -8%     10/10    9/10        7/10    6/10   24%
+  + learning progress by region            +4%     +0%   never   never       -5%     -0%     +9%     +1%      7/10    8/10        6/10    5/10   22%
+  + prediction drift                      +17%     +7%   never   never      -14%     -4%    +15%    +13%      8/10   10/10        8/10    6/10   38%
+    slope vs batch                         +3%     +0%   never   never       -3%     -1%    +12%    +16%      6/10    8/10        6/10    5/10   24%
+  + slope vs neighbours                    +3%   never   never   never       -3%     +3%    +14%    +16%      7/10    7/10        7/10    3/10   27%
+    slope consistency                    never   never   never   never       +7%     +8%    +26%    +19%      5/10    3/10        3/10    1/10   10%
+    teaching value, one step               +0%   never   never   never       -1%     +1%    +12%    +17%      6/10    7/10        5/10    5/10   25%
+  + novelty x steepness                   +24%    +24%    +11%    +13%      -20%    -15%    -13%    -16%     10/10   10/10       10/10   10/10   16%
+    raw error, line critic               never   never   never   never      +56%    +52%   +150%   +214%      1/10    0/10        1/10    0/10   69%
+  + repeat agreement, line critic         +17%     +6%   never   never      -21%     -3%    +17%    +12%     10/10    9/10        9/10    5/10   24%
+
+Verdict, by the rules fixed before the run
+  Works (ends below the do-nothing critic in at least 7 of 10 runs, in both narrow worlds): repeat agreement x steepness; disagreement x steepness; repeat agreement; ensemble disagreement; random-network novelty; feature novelty; pinned weights; not choosing; slope, same push twice; slope, same push twice, last layer; forward progress; progress over 3 rounds; progress over 10 rounds; progress, new first; learning progress by region; prediction drift; slope vs neighbours; novelty x steepness; repeat agreement, line critic.
+  Not choosing passes this rule too: the do-nothing critic ends worse than not choosing. So a learner
+  no better than not choosing can pass, and the luck count below is too low.
+  The best of the bar to beat is feature novelty. Bets that beat it the same way: none.
+  Flagged (a plain world's end error more than 5% above not choosing's): steepness; raw error x steepness; raw error; repeat agreement; pinned weights; do-nothing critic; slope, same push twice; slope, same push twice, last layer; near copies 2%; forward progress; learning progress by region; prediction drift; slope vs batch; slope vs neighbours; slope consistency; teaching value, one step; raw error, line critic; repeat agreement, line critic.
+  Luck: with no real difference, 7 or more of 10 runs happen 17% of the time in one world and 3% in both, so over 27 learners about 0.8 would pass by luck.
+Not fixed before the run: the same count against not choosing
+  Ends below not choosing in at least 7 of 10 runs in both narrow worlds: repeat agreement x steepness; disagreement x steepness; repeat agreement; ensemble disagreement; feature novelty; pinned weights; slope, same push twice; progress over 3 rounds; progress over 10 rounds; novelty x steepness.
+  ... and in both plain worlds as well: feature novelty.
