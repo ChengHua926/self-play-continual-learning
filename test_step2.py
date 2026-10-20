@@ -4,13 +4,18 @@ Run them with:   python3 -m unittest test_step2 -v
 """
 
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 
-from critic import Critic
+from critic import Critic, forecast_agreement, object_average
 from network import Network
 from run_step1 import PAST_SELF_AGE, PUSHES_PER_ROUND
-from run_step2 import CHECK_EVERY, LEFT_TO_CHANCE, PATIENCE, choose_pushes, grade_before_training, train
+from run_step2 import (
+    ACTIONS_PER_ROUND, CHECK_EVERY, CRITIC_CHECKS, LEFT_TO_CHANCE, PATIENCE, VALIDATION_PER_ROUND, choose_pushes,
+    grade_before_training,
+    check_critic, records, run, train,
+)
 from world import EDGE, OBJECTS, STRONG, TABLE, TOY, as_inputs, joined, make_world, narrowed, random_pushes
 
 
@@ -74,10 +79,22 @@ class CriticTests(unittest.TestCase):
 
     def test_the_critics_favourites_are_the_pushes_that_get_made(self):
         on_table = self.everything.astype(bool)
-        chosen = choose_pushes(self.toy_lover(), self.network, TABLE, on_table, self.everything, self.rng)
-        self.assertEqual(len(chosen), PUSHES_PER_ROUND)
+        chosen, by_chance = choose_pushes(self.toy_lover(), self.network, TABLE, on_table, self.everything, self.rng, 256)
+        self.assertEqual(len(chosen), 256)
+        self.assertEqual(by_chance.sum(), LEFT_TO_CHANCE * 256)
         # Every push the critic picks should be a toy push. Only the random ones may be something else.
-        self.assertGreaterEqual((chosen.obj == TOY).sum(), PUSHES_PER_ROUND - LEFT_TO_CHANCE)
+        self.assertTrue((chosen.obj[~by_chance] == TOY).all())
+
+    def test_forecast_agreement_reads_only_the_order(self):
+        grades = np.array([0.1, 0.5, 0.2, 0.9, 0.4])
+        self.assertAlmostEqual(forecast_agreement(grades, grades), 1.0)
+        self.assertAlmostEqual(forecast_agreement(10 * grades + 3, grades), 1.0)  # same order, other scale
+        self.assertAlmostEqual(forecast_agreement(-grades, grades), -1.0)
+
+    def test_the_object_average_forecasts_each_push_by_its_objects_past_grades(self):
+        past_objects, past_grades = np.array([0, 0, 1, 1]), np.array([1.0, 3.0, 10.0, 20.0])
+        forecasts = object_average(np.array([1, 0, 2]), past_objects, past_grades)
+        np.testing.assert_allclose(forecasts, [15.0, 2.0, 8.5])  # object 2 has no past grades: the average of all
 
     def test_progress_over_time_grades_nothing_until_there_is_a_past_self(self):
         pushes = random_pushes(8, self.everything, self.rng)
@@ -87,6 +104,72 @@ class CriticTests(unittest.TestCase):
         enough = [self.network.copy()] * PAST_SELF_AGE
         self.assertIsNone(grade_before_training("progress over time", self.network, too_few, predictions, inputs, results, results))
         self.assertEqual(len(grade_before_training("progress over time", self.network, enough, predictions, inputs, results, results)), 8)
+
+
+class BudgetTests(unittest.TestCase):
+    """Short runs of two rounds, to check how each learner spends its actions."""
+
+    def memory_added_per_round(self, learner, budget, guard="none"):
+        """Run two rounds, and see how much memory holds each time the network trains."""
+        sizes = []
+
+        def counting_train(network, memory_inputs, *rest):  # stands in for train: counts, trains nothing
+            sizes.append(len(memory_inputs))
+            return 0
+
+        with patch("run_step2.ROUNDS", 2), patch("run_step2.train", counting_train):
+            _, pushes_made, _, critic_check = run(learner, 1, seed=0, budget=budget, guard=guard)
+        return sizes, pushes_made.sum(axis=1), critic_check
+
+    def test_every_learner_adds_the_same_records_to_memory_each_round(self):
+        for budget in ("fair", "doubled"):
+            for learner in ("even pushing", "raw error", "repeat agreement"):
+                sizes, _, _ = self.memory_added_per_round(learner, budget)
+                # Half A goes in before training, half B after it. So before the second round's
+                # training, memory holds all of round one and half A of round two.
+                self.assertEqual(sizes, [ACTIONS_PER_ROUND // 2, ACTIONS_PER_ROUND + ACTIONS_PER_ROUND // 2])
+
+    def test_with_early_stopping_every_learner_keeps_the_same_records_for_validation(self):
+        for budget in ("fair", "doubled"):
+            for learner in ("even pushing", "repeat agreement"):
+                sizes, _, _ = self.memory_added_per_round(learner, budget, guard="early stopping")
+                a_kept = ACTIONS_PER_ROUND // 2 - VALIDATION_PER_ROUND  # half A, less what goes to validation
+                b = ACTIONS_PER_ROUND // 2
+                self.assertEqual(sizes, [a_kept, a_kept + b + a_kept])
+
+    def test_with_the_fair_budget_repeat_agreement_does_only_half_b_twice(self):
+        # 128 pushes in half A done once, and 64 in half B done twice: 256 actions, 192 different pushes.
+        for learner, different_pushes in (("even pushing", 256), ("raw error", 256), ("repeat agreement", 192)):
+            _, pushes_made, _ = self.memory_added_per_round(learner, "fair")
+            np.testing.assert_array_equal(pushes_made, different_pushes)
+        _, pushes_made, _ = self.memory_added_per_round("raw error", "doubled")
+        np.testing.assert_array_equal(pushes_made, PUSHES_PER_ROUND)
+
+    def test_the_critic_is_checked_only_after_it_has_learned(self):
+        _, _, critic_check = self.memory_added_per_round("raw error", "fair")
+        for name in CRITIC_CHECKS:
+            self.assertTrue(np.isnan(critic_check[name][0]))  # nothing learned yet in the first round
+            self.assertTrue(-1 <= critic_check[name][1] <= 1)
+
+    def test_the_critic_check_scores_both_forecasters_with_and_without_the_toys(self):
+        objects = np.array([0, 0, 2, 2, TOY, TOY])
+        grades = np.array([1.0, 2.0, 3.0, 4.0, 0.0, 9.0])
+        forecasts = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])  # the right order, except for the toys
+        past_grades = [(np.array([0, 2, TOY]), np.array([1.0, 3.0, 4.0]))]
+        check = check_critic(forecasts, grades, objects, TABLE, past_grades)
+        self.assertAlmostEqual(check["critic_no_toys"], 1.0)
+        self.assertLess(check["critic"], 0.9)
+        # The object average forecasts 1, 1, 3, 3 for the pushes that are not toys.
+        self.assertAlmostEqual(check["object_average_no_toys"], forecast_agreement(np.array([1.0, 1, 3, 3]), grades[:4]))
+
+    def test_a_push_done_twice_goes_into_memory_twice(self):
+        inputs, first, second = np.arange(3.0)[:, None], np.zeros((3, 3)), np.ones((3, 3))
+        which = np.array([True, False, True])
+        once_inputs, _ = records(inputs, first, None, which)
+        twice_inputs, twice_results = records(inputs, first, second, which)
+        self.assertEqual(len(once_inputs), 2)
+        self.assertEqual(len(twice_inputs), 4)
+        np.testing.assert_array_equal(twice_results, np.concatenate([first[which], second[which]]))
 
 
 class NarrowWorldTests(unittest.TestCase):

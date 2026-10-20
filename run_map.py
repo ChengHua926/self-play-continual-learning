@@ -18,6 +18,10 @@ a spinner and a toy, with a third of the objects arriving late. Each seed gets i
 random world, and all learners of that seed share it, so they are compared on the same
 worlds. Pushes left to chance are spread evenly over the objects.
 
+The map gave every learner 128 pushes per round, each done twice (the "doubled" budget,
+see run_step2.py). That favours repeat agreement. Step A (run_step_a.py) redoes part of
+the map with a fair budget.
+
 Run it with:   python3 run_map.py            (the plain worlds)
          or:   python3 run_map.py narrow     (the narrow worlds)
 Each takes about ten minutes, writes its results file, and prints the report.
@@ -55,11 +59,14 @@ def build_world(name, seed):
     return make_world(int(base), np.random.default_rng(10_000 + seed), narrow=narrow)
 
 
-def run_in_its_world(learner, train_steps, world_name, guard, seed):
-    """One learner in one cell of the map, for one seed. Returns four lines over the rounds."""
+def run_in_its_world(learner, train_steps, world_name, guard, seed, budget):
+    """One learner in one cell of the map, for one seed. Returns lines over the rounds.
+
+    budget is "doubled", as the map used, or "fair", as step A uses (see run_step2.py).
+    """
     world = build_world(world_name, seed)
-    true_error, pushes_made, steps_taken = run(
-        learner, train_steps, seed, world=world, share=np.ones(len(world.names)), guard=guard,
+    true_error, pushes_made, steps_taken, critic_check = run(
+        learner, train_steps, seed, world=world, share=np.ones(len(world.names)), guard=guard, budget=budget,
     )
     toy = np.array([kind == "toy" for kind in world.kinds])
     return {
@@ -67,6 +74,7 @@ def run_in_its_world(learner, train_steps, world_name, guard, seed):
         "toy_error": np.nanmean(true_error[:, toy], axis=1),   # true error of the toys: how much noise was memorized
         "toy_share": pushes_made[:, toy].sum(axis=1) / pushes_made.sum(axis=1),
         "steps_taken": steps_taken,                            # fewer than train_steps when early stopping stopped
+        **critic_check,                                        # how well the critic forecast its label (run_step2.py)
     }
 
 
@@ -76,7 +84,8 @@ if __name__ == "__main__":
     cells = list(product(worlds, GUARDS, TRAINING, LEARNERS, SEEDS))
     with Pool() as pool:  # the runs do not depend on each other, so do them side by side
         results = pool.starmap(
-            run_in_its_world, [(learner, steps, world, guard, seed) for world, guard, steps, learner, seed in cells]
+            run_in_its_world,
+            [(learner, steps, world, guard, seed, "doubled") for world, guard, steps, learner, seed in cells],
         )
 
     # Every line is saved as [world, guard, training setting, learner, run, round].
