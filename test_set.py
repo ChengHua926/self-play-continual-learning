@@ -31,6 +31,7 @@ import numpy as np
 
 from explore import rounds, start
 from game import BUTTONS, ROOM_BYTE, change
+from learners import LEARNERS
 
 TEST_SET_FILE = "results/montezuma_test_set.npz"
 EXPLORERS = (("cell counts", 101), ("cell counts", 102), ("uniform choice", 103), ("uniform choice", 104))
@@ -83,14 +84,16 @@ def load():
     return TestSet(saved["before"], saved["button"], saved["after"])
 
 
-def explore_and_press(rule, seed):
-    """Explore without learning, then press every button once from up to PLACES_PER_ROOM places per room."""
+def explore_and_press(rule, seed, places_per_room=PLACES_PER_ROOM):
+    """Explore without learning, then press every button once from up to places_per_room places per room."""
     rng = np.random.default_rng(seed)
     game, places = start(seed)
-    for _ in rounds(rule, game, places, rng, EXPLORER_FRAMES):
+    explorer = LEARNERS[rule](rng, None, None)  # it chooses, but has no world model to learn
+    for _ in rounds(explorer, game, places, rng, EXPLORER_FRAMES):
         pass
     rooms = np.array([memory[ROOM_BYTE] for memory in places.memory])
-    picked = np.concatenate([rng.permutation(np.flatnonzero(rooms == room))[:PLACES_PER_ROOM] for room in np.unique(rooms)])
+    picked = np.concatenate([rng.permutation(np.flatnonzero(rooms == room))[:places_per_room]
+                             for room in np.unique(rooms)])
     before, button, after = [], [], []
     for place in picked:
         for b in range(BUTTONS):

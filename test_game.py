@@ -10,6 +10,7 @@ import numpy as np
 
 import explore
 from explore import LEFT_TO_CHANCE, PLACES_PER_ROUND, Places, choose, press_randomly, rounds, start
+from learners import CONTROLS, LEARNERS
 from game import BUTTONS, MEMORY_SIZE, ROOM_BYTE, Game, change
 from test_set import TestSet, knowledge
 from world_model import Replay, WorldModel, inputs
@@ -42,12 +43,87 @@ class GameTests(unittest.TestCase):
         self.assertEqual(game.frames_played, 40)
 
 
+class ScriptedGame:
+    """Stands in for the game: the screen code met after each press, and the lives left after each press."""
+
+    def __init__(self, codes, lives):
+        self.codes, self.lives_after = codes, lives  # lives_after[k]: lives left after k presses
+        self.presses, self.frames_played = 0, 0
+
+    def press(self, button):
+        self.presses += 1
+        self.frames_played += 4
+
+    def memory(self):
+        return np.full(MEMORY_SIZE, self.presses, dtype=np.uint8)
+
+    def save(self):
+        return self.presses
+
+    def lives(self):
+        return self.lives_after[self.presses]
+
+    def over(self):
+        return False
+
+    def screen_code(self):
+        return self.codes[self.presses - 1]
+
+
 class PlacesTests(unittest.TestCase):
     def test_a_place_met_again_is_counted_not_saved_again(self):
+        game, places = ScriptedGame(["a", "b", "a", "b", "a"] + ["new"] * 30, [5] * 40), Places()
+        press_randomly(game, np.random.default_rng(0), places, presses=5, stop_at_lost_life=True)
+        self.assertEqual(places.index, {"a": 0, "b": 1})
+        self.assertEqual(places.visits, [3, 2])
+
+    def test_a_place_keeps_the_saved_game_from_when_it_was_first_met(self):
+        game, places = ScriptedGame(["a", "b", "a"] + ["new"] * 30, [5] * 40), Places()
+        press_randomly(game, np.random.default_rng(0), places, presses=3, stop_at_lost_life=True)
+        self.assertEqual(places.saved[places.index["a"]], 1)  # saved after the first press, not the third
+
+    def test_places_met_in_the_last_20_presses_before_a_lost_life_are_not_saved(self):
+        codes = [f"place {press}" for press in range(30)]
+        lives = [5] * 30 + [4]  # the life is lost on press 29 (the 30th)
+        game, places = ScriptedGame(codes, lives), Places()
+        press_randomly(game, np.random.default_rng(0), places, presses=50, stop_at_lost_life=True)
+        # Met on presses 0 to 8 (21 or more presses before the death): saved. Met on presses 9 to 28: not.
+        self.assertEqual(list(places.index), codes[:9])
+        self.assertEqual(game.presses, 30)  # and the presses stop at the lost life
+
+    def test_when_the_presses_run_out_pressing_goes_on_until_the_last_new_places_are_safe(self):
+        codes = [f"place {press}" for press in range(10)]
+        game, places = ScriptedGame(codes + ["met while waiting"] * 30, [5] * 41), Places()
+        press_randomly(game, np.random.default_rng(0), places, presses=10, stop_at_lost_life=True)
+        self.assertEqual(list(places.index), codes)  # the code met while waiting is not saved
+        self.assertEqual(game.presses, 30)          # "place 9" was met on press 9 and waited 20 more
+
+    def test_a_life_lost_while_waiting_drops_the_waiting_places(self):
+        codes = [f"place {press}" for press in range(10)]
+        lives = [5] * 16 + [4] * 30  # the life is lost on press 15, after the 10 presses ran out
+        game, places = ScriptedGame(codes + ["falling"] * 30, lives), Places()
+        press_randomly(game, np.random.default_rng(0), places, presses=10, stop_at_lost_life=True)
+        self.assertEqual(len(places), 0)
+        self.assertEqual(game.presses, 16)
+
+    def test_random_play_goes_on_after_a_lost_life(self):
+        codes = [f"place {press}" for press in range(60)]
+        lives = [5] * 6 + [4] * 60  # a life is lost on press 5
+        game, places = ScriptedGame(codes, lives), Places()
+        press_randomly(game, np.random.default_rng(0), places, presses=40, stop_at_lost_life=False)
+        self.assertGreaterEqual(game.presses, 40)
+        self.assertIn("place 6", places.index)  # met after the lost life, more than 20 presses before the end
+
+    def test_every_run_of_presses_is_credited_with_the_new_places_it_met(self):
         game, places = start(seed=0)
-        self.assertEqual((len(places), places.visits), (1, [1]))
-        self.assertFalse(places.visit(game))
-        self.assertEqual((len(places), places.visits), (1, [2]))
+        rng = np.random.default_rng(0)
+        bursts = next(rounds(LEARNERS["uniform choice"](rng, None, None), game, places, rng, frames=10**9))
+        self.assertEqual(sum(places.chosen), PLACES_PER_ROUND)  # each jump back counted
+        saved_now = set(places.index) - {next(iter(places.index))}
+        for burst in bursts:
+            self.assertEqual(burst.new_places, len(burst.met & saved_now))
+        # All 32 started from the one place there was, so several met the same new places, and each is credited.
+        self.assertGreater(sum(burst.new_places for burst in bursts), len(saved_now))
 
     def test_a_saved_place_brings_back_its_memory(self):
         game, places = start(seed=0)
@@ -64,16 +140,35 @@ class ChoosingTests(unittest.TestCase):
         self.places = Places()
         self.places.saved = [None] * 100
         self.places.visits = list(range(1, 101))  # place 0 was visited least
+        self.places.chosen = [0] * 100
 
     def test_a_round_jumps_back_to_32_places_a_quarter_of_them_by_chance(self):
-        chosen = choose("uniform choice", self.places, np.random.default_rng(0))
+        rng = np.random.default_rng(0)
+        chosen = choose(LEARNERS["uniform choice"](rng, None, None), self.places, rng)
         self.assertEqual(len(chosen), PLACES_PER_ROUND)
         self.assertEqual(round(LEFT_TO_CHANCE * PLACES_PER_ROUND), 8)
+
+    def test_cell_counts_prefers_places_jumped_back_to_least_then_visited_least(self):
+        places = Places()
+        places.visits, places.chosen = [1, 1, 50], [0, 10, 0]
+        score = LEARNERS["cell counts"](None, None, None).score(places, np.arange(3))
+        # 0.3 / sqrt(visits) + 0.1 / sqrt(chosen), both with 0.001 added: never jumped back to counts most.
+        self.assertEqual(list(np.argsort(-score)), [0, 2, 1])
+
+    def test_the_controls_score_as_they_say(self):
+        places = Places()
+        places.visits = [1, 100, 50]
+        places.memory = [np.full(MEMORY_SIZE, room, dtype=np.uint8) for room in (1, 1, 2)]  # rooms 1, 1, 2
+        most_visited = CONTROLS["most visited"](None, None, None).score(places, np.arange(3))
+        room_oracle = CONTROLS["room oracle"](None, None, None).score(places, np.arange(3))
+        self.assertEqual(int(most_visited.argmax()), 1)
+        # Place 0 is the least visited place, but its room has 101 visits; place 2's room has 50.
+        self.assertEqual(int(room_oracle.argmax()), 2)
 
     def test_cell_counts_picks_the_least_visited_of_its_candidates(self):
         rng = np.random.default_rng(0)
         candidates = np.random.default_rng(0).integers(100, size=8 * 24)
-        chosen = choose("cell counts", self.places, rng)[:24]
+        chosen = choose(LEARNERS["cell counts"](rng, None, None), self.places, rng)[:24]
         np.testing.assert_array_equal(np.sort(chosen), np.sort(candidates)[:24])
 
 
@@ -84,7 +179,7 @@ class PressingTests(unittest.TestCase):
         saved = game.save()
         for _ in range(200):
             game.restore(saved)
-            before, buttons, after = press_randomly(game, rng, places, presses=50, stop_at_lost_life=True)
+            before, buttons, after, _ = press_randomly(game, rng, places, presses=50, stop_at_lost_life=True)
             self.assertEqual(before.shape, after.shape)
             self.assertEqual(len(buttons), len(before))
             lives_left = after[:, 58]  # memory byte 58 holds the lives left, less one
@@ -104,7 +199,8 @@ class PressingTests(unittest.TestCase):
     def test_the_frame_budget_is_kept_and_random_play_never_jumps_back(self):
         game, places = start(seed=0)
         with patch.object(Game, "restore", side_effect=AssertionError("random play jumped back")):
-            for _ in rounds("random play", game, places, np.random.default_rng(0), frames=20_000):
+            rng = np.random.default_rng(0)
+            for _ in rounds(LEARNERS["random play"](rng, None, None), game, places, rng, frames=20_000):
                 pass
         self.assertGreaterEqual(game.frames_played, 20_000)
         self.assertLess(game.frames_played, 20_000 + PLACES_PER_ROUND * explore.PRESSES * 4)
@@ -147,7 +243,7 @@ class WorldModelTests(unittest.TestCase):
     def test_the_world_model_learns_the_steps_it_trains_on(self):
         game, places = start(seed=0)
         rng = np.random.default_rng(0)
-        before, buttons, after = press_randomly(game, rng, places, presses=3_000, stop_at_lost_life=False)
+        before, buttons, after, _ = press_randomly(game, rng, places, presses=3_000, stop_at_lost_life=False)
         replay = Replay(rng)
         replay.add(before, buttons, after)
         model = WorldModel(rng)
@@ -214,7 +310,7 @@ class TestSetTests(unittest.TestCase):
 class RunTests(unittest.TestCase):
     def test_a_short_run_of_every_learner_measures_every_line(self):
         game, places = start(seed=0)
-        before, buttons, after = press_randomly(game, np.random.default_rng(0), places, 2_000, stop_at_lost_life=False)
+        before, buttons, after, _ = press_randomly(game, np.random.default_rng(0), places, 2_000, stop_at_lost_life=False)
         small_test_set = TestSet(before[:500], buttons[:500].astype(np.uint8), after[:500])
         with patch("explore.MEASURE_EVERY", 10_000):
             for learner in ("uniform choice", "cell counts", "random play"):

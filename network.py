@@ -102,6 +102,13 @@ class Network:
         error[:, output] = 1
         return layer_inputs, self._pass_back(layer_inputs, error)
 
+    def direction_slopes(self, inputs, direction):
+        """How one direction in the outputs (a weighted sum of them, one weight per output) moves
+        with every weight, per example. Returned as output_slopes returns them."""
+        layer_inputs, outputs = self._forward(inputs)
+        error = np.tile(direction, (len(inputs), 1))
+        return layer_inputs, self._pass_back(layer_inputs, error)
+
     def train_step(self, inputs, targets, noise=None):
         """Learn a little from one batch of examples. For noise, see backward."""
         _, layer_inputs, layer_errors = self.backward(inputs, targets, noise)
