@@ -1,0 +1,170 @@
+Every number: the average over 10 runs ± its standard error, with 20 training steps per round;
+in brackets, the same with 100 steps per round (the stress test, not part of any rule).
+
+1. Ignores noise: share of toy pushes that are top picks (chance 25%, pass at most 30% everywhere).
+
+                                           6                  24            narrow 6           narrow 24
+  raw error                     89%±2% (94%)        89%±1% (92%)        81%±2% (85%)        83%±1% (83%)   FAIL
+  repeat agreement              46%±2% (51%)        47%±1% (51%)        40%±2% (46%)        42%±1% (46%)   FAIL
+  slope agreement               43%±2% (46%)        43%±1% (46%)        41%±2% (44%)        41%±1% (44%)   FAIL
+  slope, similar pushes         44%±1% (47%)        43%±1% (45%)        42%±1% (45%)        41%±1% (44%)   FAIL
+  slope, same push twice        45%±2% (51%)        46%±1% (51%)        38%±2% (45%)        40%±1% (45%)   FAIL
+  slope, last layer             43%±1% (47%)        43%±1% (46%)        43%±1% (45%)        41%±1% (44%)   FAIL
+  slope consistency             19%±1% (16%)        23%±0% (19%)        22%±1% (21%)        24%±1% (23%)   pass
+  progress over time            44%±1% (48%)        43%±1% (46%)        40%±1% (45%)        42%±1% (45%)   FAIL
+  progress, new first           43%±2% (47%)        43%±1% (46%)        40%±2% (44%)        42%±1% (44%)   FAIL
+  forward progress              45%±1% (46%)        44%±1% (46%)        42%±1% (46%)        42%±1% (45%)   FAIL
+  pinned weights                23%±4% (62%)        23%±1% (58%)        25%±4% (51%)        30%±2% (51%)   pass
+  prediction drift              49%±5% (65%)        45%±1% (61%)        41%±3% (56%)        41%±1% (55%)   FAIL
+  feature novelty               20%±7% (50%)        21%±1% (51%)        22%±8% (45%)        26%±1% (51%)   pass
+  ensemble disagreement         42%±7% (74%)        39%±1% (63%)        37%±6% (59%)        38%±1% (53%)   FAIL
+  random-network novelty        23%±8% (24%)        24%±2% (25%)        23%±8% (24%)        24%±2% (25%)   pass
+  predicted size                  2%±0% (7%)         3%±0% (10%)        11%±2% (26%)        18%±1% (34%)   pass
+  push strength                 26%±0% (25%)        24%±1% (25%)        26%±0% (25%)        24%±1% (25%)   pass
+  random number                 25%±0% (24%)        25%±0% (25%)        25%±0% (24%)        25%±0% (25%)   pass
+
+   Beside it: share of rounds in which the toys' average score is above the other objects'.
+
+  raw error                   100%±0% (100%)      100%±0% (100%)      100%±0% (100%)      100%±0% (100%)
+  repeat agreement              47%±4% (67%)        55%±1% (70%)        34%±5% (56%)        43%±2% (60%)
+  slope agreement               34%±3% (43%)        40%±2% (44%)        39%±2% (44%)        40%±1% (42%)
+  slope, similar pushes         45%±3% (49%)        46%±2% (51%)        48%±2% (50%)        46%±2% (53%)
+  slope, same push twice        47%±4% (67%)        50%±2% (68%)        31%±5% (51%)        39%±2% (57%)
+  slope, last layer             44%±3% (50%)        47%±1% (52%)        47%±2% (51%)        46%±2% (50%)
+  slope consistency             27%±2% (20%)        34%±1% (28%)        34%±3% (31%)        37%±2% (40%)
+  progress over time            46%±3% (48%)        48%±2% (49%)        45%±2% (47%)        51%±1% (48%)
+  progress, new first           44%±3% (45%)        42%±2% (44%)        43%±3% (45%)        46%±2% (42%)
+  forward progress              46%±2% (48%)        49%±2% (50%)        49%±2% (50%)        49%±1% (52%)
+  pinned weights               36%±10% (96%)        49%±4% (96%)       42%±11% (84%)        66%±7% (96%)
+  prediction drift              83%±4% (92%)        90%±1% (98%)        77%±6% (90%)        86%±2% (97%)
+  feature novelty              23%±10% (88%)        31%±4% (95%)       27%±11% (80%)        56%±6% (97%)
+  ensemble disagreement         68%±8% (95%)        81%±3% (97%)        59%±9% (89%)        80%±3% (95%)
+  random-network novelty       25%±11% (25%)        41%±5% (40%)       25%±11% (25%)        41%±5% (40%)
+  predicted size                  1%±1% (6%)          0%±0% (5%)         7%±2% (36%)        18%±3% (59%)
+  push strength                 52%±3% (50%)        50%±2% (51%)        52%±3% (50%)        50%±2% (51%)
+  random number                 49%±2% (48%)        51%±2% (48%)        49%±2% (48%)        51%±2% (48%)
+
+2. Notices new things: share of arrivals after which a new object that is not a toy beats every old
+   object, in the round it arrives or the next (pass at least 80% in both plain worlds; narrow ones
+   for reference).
+
+                                           6                  24            narrow 6           narrow 24
+  raw error                    50%±17% (45%)        15%±8% (15%)       40%±15% (30%)          5%±5% (5%)   FAIL
+  repeat agreement             95%±5% (100%)       75%±11% (70%)        95%±5% (90%)       50%±11% (50%)   FAIL
+  slope agreement               95%±5% (90%)       55%±14% (45%)        90%±7% (90%)       45%±12% (60%)   FAIL
+  slope, similar pushes        100%±0% (95%)       50%±11% (60%)        95%±5% (90%)       40%±10% (40%)   FAIL
+  slope, same push twice        95%±5% (90%)       65%±13% (55%)       85%±11% (80%)       50%±11% (45%)   FAIL
+  slope, last layer            100%±0% (90%)        55%±9% (40%)        95%±5% (95%)       45%±12% (40%)   FAIL
+  slope consistency             95%±5% (70%)       25%±11% (45%)       75%±11% (65%)        35%±8% (45%)   FAIL
+  progress over time            95%±5% (95%)        55%±9% (45%)       65%±13% (95%)        10%±7% (55%)   FAIL
+  progress, new first         100%±0% (100%)      100%±0% (100%)      100%±0% (100%)      100%±0% (100%)   pass
+  forward progress             100%±0% (95%)        75%±8% (75%)        95%±5% (95%)       65%±11% (60%)   FAIL
+  pinned weights              100%±0% (100%)      100%±0% (100%)      100%±0% (100%)      100%±0% (100%)   pass
+  prediction drift             65%±11% (75%)        25%±8% (65%)       65%±11% (80%)        20%±8% (50%)   FAIL
+  feature novelty             100%±0% (100%)      100%±0% (100%)      100%±0% (100%)      100%±0% (100%)   pass
+  ensemble disagreement       100%±0% (100%)      100%±0% (100%)      100%±0% (100%)      100%±0% (100%)   pass
+  random-network novelty      100%±0% (100%)      100%±0% (100%)      100%±0% (100%)      100%±0% (100%)   pass
+  predicted size               40%±12% (35%)        10%±7% (15%)       85%±11% (80%)       60%±10% (65%)   FAIL
+  push strength                45%±12% (20%)       30%±13% (35%)       45%±12% (20%)       30%±13% (35%)   FAIL
+  random number                20%±11% (35%)       35%±13% (20%)       20%±11% (35%)       35%±13% (20%)   FAIL
+
+   Beside it: share of the new objects' pushes that are top picks in those two rounds (chance 25%).
+
+  raw error                     59%±5% (59%)        45%±3% (46%)        42%±6% (45%)        29%±2% (29%)
+  repeat agreement              79%±3% (81%)        66%±3% (64%)        58%±5% (62%)        43%±3% (42%)
+  slope agreement               56%±3% (57%)        39%±3% (40%)        49%±5% (52%)        33%±2% (34%)
+  slope, similar pushes         66%±3% (62%)        37%±2% (40%)        57%±5% (55%)        35%±2% (36%)
+  slope, same push twice        77%±4% (78%)        60%±3% (56%)        57%±5% (56%)        42%±3% (39%)
+  slope, last layer             66%±3% (63%)        36%±2% (41%)        56%±4% (52%)        35%±3% (36%)
+  slope consistency             48%±4% (38%)        28%±2% (30%)        45%±5% (37%)        30%±2% (30%)
+  progress over time            49%±2% (56%)        35%±2% (46%)        40%±3% (51%)        25%±2% (35%)
+  progress, new first           98%±1% (99%)       100%±0% (96%)        98%±1% (99%)       100%±0% (97%)
+  forward progress              62%±3% (66%)        48%±3% (52%)        54%±4% (56%)        38%±2% (41%)
+  pinned weights                92%±2% (87%)        94%±2% (82%)        91%±2% (88%)        89%±3% (84%)
+  prediction drift              42%±2% (56%)        24%±1% (36%)        33%±2% (50%)        22%±2% (37%)
+  feature novelty               98%±1% (99%)        91%±2% (70%)        98%±1% (98%)        87%±3% (66%)
+  ensemble disagreement         98%±1% (97%)        95%±1% (86%)        98%±1% (96%)        91%±2% (80%)
+  random-network novelty        98%±1% (99%)        95%±1% (95%)        98%±1% (99%)        95%±1% (95%)
+  predicted size                35%±5% (31%)        28%±2% (25%)        55%±4% (49%)        38%±2% (39%)
+  push strength                 25%±2% (27%)        26%±3% (23%)        25%±2% (27%)        26%±3% (23%)
+  random number                 24%±2% (24%)        25%±2% (26%)        24%±2% (24%)        25%±2% (26%)
+
+3. Finds rare useful pushes: chance that a narrow-part push outranks another push on the same kind of
+   object (0.5 = no preference). Pass: at least 0.6 in both narrow worlds, and 0.05 above the plain world.
+   Light training only. b = boxes, r = rollers, s = spinners.
+
+                                    6: b r s           24: b r s     narrow 6: b r s    narrow 24: b r s
+  raw error                   0.62 0.51 0.65      0.65 0.52 0.65      0.74 0.78 0.86      0.76 0.81 0.87   pass
+  repeat agreement            0.62 0.51 0.65      0.65 0.52 0.65      0.74 0.78 0.86      0.76 0.81 0.87   pass
+  slope agreement             0.51 0.51 0.53      0.52 0.50 0.49      0.52 0.51 0.55      0.49 0.49 0.48   FAIL
+  slope, similar pushes       0.51 0.50 0.53      0.51 0.50 0.50      0.51 0.46 0.51      0.47 0.45 0.46   FAIL
+  slope, same push twice      0.66 0.51 0.67      0.71 0.53 0.67      0.77 0.76 0.85      0.80 0.78 0.88   pass
+  slope, last layer           0.51 0.50 0.53      0.51 0.50 0.50      0.51 0.46 0.51      0.47 0.46 0.47   FAIL
+  slope consistency           0.50 0.50 0.51      0.50 0.51 0.49      0.48 0.46 0.47      0.46 0.46 0.45   FAIL
+  progress over time          0.53 0.51 0.53      0.54 0.52 0.55      0.57 0.52 0.55      0.55 0.51 0.56   FAIL
+  progress, new first         0.53 0.51 0.54      0.54 0.52 0.55      0.56 0.52 0.56      0.55 0.51 0.56   FAIL
+  forward progress            0.52 0.52 0.52      0.51 0.54 0.51      0.53 0.51 0.54      0.53 0.50 0.52   FAIL
+  pinned weights              0.60 0.49 0.69      0.74 0.50 0.68      0.66 0.50 0.72      0.76 0.50 0.73   FAIL
+  prediction drift            0.55 0.50 0.54      0.60 0.49 0.57      0.58 0.52 0.56      0.62 0.51 0.59   FAIL
+  feature novelty             0.60 0.49 0.62      0.67 0.51 0.65      0.62 0.50 0.65      0.68 0.51 0.69   FAIL
+  ensemble disagreement       0.60 0.50 0.64      0.65 0.52 0.64      0.67 0.52 0.69      0.70 0.52 0.70   FAIL
+  random-network novelty      0.54 0.49 0.64      0.52 0.50 0.64      0.54 0.49 0.64      0.52 0.50 0.64   FAIL
+  predicted size              0.91 0.65 0.80      0.88 0.63 0.79      0.92 0.62 0.68      0.89 0.57 0.68   FAIL
+  push strength               0.99 0.48 0.50      0.99 0.50 0.51      0.99 0.48 0.50      0.99 0.50 0.51   FAIL
+  random number               0.50 0.51 0.50      0.50 0.50 0.50      0.50 0.51 0.50      0.50 0.50 0.50   FAIL
+   (standard errors at most 0.03)
+
+Forecastable: how well the object's average score in the three rounds before forecasts the order of
+each round's scores (1 = the same order, 0 = no relation). Not part of any rule.
+
+                                           6                  24            narrow 6           narrow 24
+  raw error               +0.63±0.02 (+0.62)  +0.59±0.01 (+0.60)  +0.50±0.02 (+0.53)  +0.46±0.01 (+0.47)
+  repeat agreement        +0.26±0.02 (+0.25)  +0.23±0.01 (+0.23)  +0.17±0.03 (+0.18)  +0.13±0.01 (+0.13)
+  slope agreement         +0.02±0.01 (+0.02)  +0.02±0.01 (-0.00)  +0.01±0.01 (+0.01)  -0.00±0.01 (-0.00)
+  slope, similar pushes   +0.03±0.01 (+0.02)  +0.00±0.00 (+0.01)  +0.02±0.01 (+0.02)  +0.02±0.00 (-0.00)
+  slope, same push twice  +0.28±0.02 (+0.28)  +0.25±0.02 (+0.27)  +0.17±0.03 (+0.18)  +0.14±0.01 (+0.15)
+  slope, last layer       +0.02±0.01 (+0.03)  +0.00±0.01 (+0.01)  +0.01±0.01 (+0.02)  +0.01±0.00 (-0.00)
+  slope consistency       +0.06±0.01 (+0.10)  +0.01±0.01 (+0.02)  +0.03±0.01 (+0.04)  +0.00±0.01 (+0.01)
+  progress over time      +0.10±0.01 (+0.07)  +0.04±0.01 (+0.03)  +0.05±0.01 (+0.04)  +0.01±0.01 (+0.02)
+  progress, new first     +0.13±0.01 (+0.09)  +0.08±0.01 (+0.07)  +0.08±0.01 (+0.06)  +0.05±0.01 (+0.05)
+  forward progress        +0.03±0.01 (+0.02)  +0.02±0.01 (+0.01)  +0.02±0.01 (+0.00)  +0.00±0.01 (-0.00)
+  pinned weights          +0.44±0.03 (+0.62)  +0.47±0.02 (+0.61)  +0.33±0.02 (+0.43)  +0.37±0.02 (+0.45)
+  prediction drift        +0.36±0.02 (+0.47)  +0.25±0.01 (+0.41)  +0.24±0.02 (+0.36)  +0.18±0.01 (+0.32)
+  feature novelty         +0.44±0.03 (+0.59)  +0.43±0.01 (+0.56)  +0.41±0.02 (+0.49)  +0.38±0.02 (+0.47)
+  ensemble disagreement   +0.51±0.02 (+0.62)  +0.40±0.01 (+0.53)  +0.42±0.02 (+0.50)  +0.33±0.01 (+0.40)
+  random-network novelty  +0.40±0.01 (+0.38)  +0.36±0.01 (+0.34)  +0.40±0.01 (+0.38)  +0.36±0.01 (+0.34)
+  predicted size          +0.44±0.03 (+0.31)  +0.43±0.01 (+0.34)  +0.23±0.02 (+0.17)  +0.19±0.01 (+0.17)
+  push strength           -0.00±0.01 (+0.00)  +0.00±0.00 (-0.01)  -0.00±0.01 (+0.00)  +0.00±0.00 (-0.01)
+  random number           +0.00±0.01 (-0.01)  -0.00±0.00 (+0.00)  +0.00±0.01 (-0.01)  -0.00±0.00 (+0.00)
+
+Passed all three checks: none
+
+4. The noise models. First: chance that a toy push is rated noisier than a push on another object
+   (pass at least 0.9). Then, for boxes, rollers and spinners: chance that a narrow-part push is rated
+   noisier than another push on the same kind of object (pass at most 0.6). Only the narrow worlds
+   count; plain ones for reference. Each line: 20 training steps per round; the line below it: 100.
+
+                                     6: toys | b r s          24: toys | b r s    narrow 6: toys | b r s   narrow 24: toys | b r s
+  noise from repeats           0.96 | 0.52 0.52 0.54     0.97 | 0.51 0.49 0.54     0.96 | 0.52 0.52 0.54     0.97 | 0.51 0.49 0.54   pass
+    (100 steps)                0.96 | 0.51 0.49 0.55     0.97 | 0.50 0.50 0.54     0.96 | 0.51 0.49 0.55     0.97 | 0.50 0.50 0.54
+  predicts its noise           0.95 | 0.52 0.49 0.43     0.98 | 0.62 0.52 0.51     0.97 | 0.84 0.53 0.58     0.98 | 0.86 0.52 0.66   FAIL
+    (100 steps)                0.98 | 0.50 0.50 0.49     0.99 | 0.51 0.51 0.49     0.97 | 0.76 0.62 0.76     0.99 | 0.73 0.54 0.72
+
+5. The noise models as guards, with even pushing and 50 training steps per round. True error at the
+   end on the learnable objects, then (in brackets) the change against no guard ± its standard error
+   and in how many runs the guard did better, then the true error of the toys (memorized noise).
+
+doubled budget                                none                  predicts its noise                  noise from repeats
+  6                 0.0078 ( +0%± 0%,  0/10) 0.045      0.0049 (-40%±11%,  8/10) 0.014      0.0054 (-29%± 3%, 10/10) 0.045
+  24                0.0138 ( +0%± 0%,  0/10) 0.066      0.0084 (-39%± 4%, 10/10) 0.023      0.0102 (-25%± 2%, 10/10) 0.063
+  narrow 6          0.0619 ( +0%± 0%,  0/10) 0.045      0.0916 (+47%±15%,  0/10) 0.014      0.0628 ( +1%± 3%,  3/10) 0.049
+  narrow 24         0.0940 ( +0%± 0%,  0/10) 0.070      0.1147 (+22%± 8%,  2/10) 0.018      0.0886 ( -6%± 2%,  7/10) 0.070
+
+fair budget                                none                  predicts its noise                  noise from repeats
+  6                 0.0068 ( +0%± 0%,  0/10) 0.054      0.0047 (-37%±18%,  9/10) 0.014      0.0054 (-19%± 4%,  9/10) 0.045
+  24                0.0112 ( +0%± 0%,  0/10) 0.100      0.0051 (-54%± 5%, 10/10) 0.020      0.0102 ( -7%± 4%,  7/10) 0.063
+  narrow 6          0.0531 ( +0%± 0%,  0/10) 0.052      0.0845 (+63%±15%,  0/10) 0.011      0.0628 (+20%± 8%,  4/10) 0.049
+  narrow 24         0.0764 ( +0%± 0%,  0/10) 0.106      0.1024 (+33%±11%,  2/10) 0.015      0.0886 (+17%± 4%,  0/10) 0.070
+
+   The guard "noise from repeats" does every push twice under both budgets (its noise model needs the
+   pairs), so its two rows are the same runs: 128 different pushes per round, not a second result.

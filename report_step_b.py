@@ -32,6 +32,9 @@ round), where the toys' noise gets memorized, are printed beside them as a stres
    for reference.
    Printed beside it, not part of the rule: the share of the new objects' pushes that are
    top picks, in those two rounds.
+   Read with care: in this toy every object has its own input switch, and a late object's
+   switch was never used before it arrives. That alone makes it look new to the measures
+   read before acting, so their pass here is close to built in.
 
 3. Finds rare useful pushes. Narrow worlds, rounds 5 to 69.
    For boxes, rollers and spinners in turn: the chance that a push in the object's narrow
@@ -41,7 +44,9 @@ round), where the toys' noise gets memorized, are printed beside them as a stres
    Why the plain worlds: there, the "narrow parts" are just hard pushes, pushes along a
    roller's facing, and hits near a spinner's edge. Those give the biggest results, so a
    signal that simply likes big results prefers them in plain worlds too. A signal that
-   never looks at results sits near 0.5 in both, by construction.
+   never looks at results scores the same in both, by construction, so it cannot pass;
+   that score need not be 0.5 (random-network novelty, for one, likes pushes at the edge
+   of the input range).
 
 A signal passes the screen if it passes all three checks.
 
@@ -382,7 +387,7 @@ def draw(signals, worlds, light):
 
     for panel, check, title, (low, high), chance in (
         (panels[0], "toys among top picks", "1. Ignores noise: toy pushes among the top picks", (0, TOYS_AT_MOST), TOP_SHARE),
-        (panels[1], "new object wins", "2. Notices new things: a new object beats every old one", (NOTICED_AT_LEAST, 1), None),
+        (panels[1], "new object wins", "2. Notices new things: a new object beats every old one\n    (decided in the plain worlds, blue)", (NOTICED_AT_LEAST, 1), None),
     ):
         panel.axvspan(low, high, color=PASS_SHADE, zorder=0)
         if chance is not None:
