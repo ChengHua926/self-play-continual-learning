@@ -106,6 +106,14 @@ class PlacesTests(unittest.TestCase):
         self.assertEqual(len(places), 0)
         self.assertEqual(game.presses, 16)
 
+    def test_a_life_gained_does_not_hide_the_next_death(self):
+        codes = [f"place {press}" for press in range(40)]
+        lives = [5] * 3 + [6] * 5 + [5] * 40  # a life gained on press 2, lost again on press 7
+        game, places = ScriptedGame(codes, lives), Places()
+        press_randomly(game, np.random.default_rng(0), places, presses=30, stop_at_lost_life=True)
+        self.assertEqual(game.presses, 8)  # the presses stop at the death on press 7
+        self.assertEqual(len(places), 0)
+
     def test_random_play_goes_on_after_a_lost_life(self):
         codes = [f"place {press}" for press in range(60)]
         lives = [5] * 6 + [4] * 60  # a life is lost on press 5

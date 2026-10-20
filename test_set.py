@@ -1,10 +1,16 @@
 """The test set: steps from all over the game, to measure how well a world model knows it.
 
 It is built once, from separate long runs of two explorers that never learn: cell counts and
-uniform choice, two runs each, with seeds no learner uses. It never comes from a learner's own
+uniform choice, four runs each of 24 million frames, with seeds no learner uses. It never comes from a learner's own
 run, so it cannot favour one. From the places these runs saved, up to PLACES_PER_ROOM are taken
 in every room they reached, and from each, every one of the 18 buttons is pressed once. The
 emulator tells us what really happens: the true change of every byte.
+
+It was rebuilt after the harness stopped saving doomed places (explore.DOOMED). The first
+version, built with commit cdb1e62, saved them, and an audit found that dying states then made
+up 29% of the first room's test steps, against 7% of what uniform choice sees. A first rebuild,
+with two runs of each explorer at 16 million frames, reached only 8 rooms, three of them with 6
+to 19 places, too thin to measure; hence four runs each, at 24 million frames.
 
 How well a world model knows the game (TestSet.knowledge), every room counting the same:
     1. its error in each room: for each test step and byte, the squared miss of the change it
@@ -22,7 +28,7 @@ How well a world model knows the game (TestSet.knowledge), every room counting t
        guesses wildly, and that is knowing nothing, not knowing less than nothing.
     3. its knowledge of the game: the average over the rooms.
 
-Run it with:   .venv/bin/python test_set.py     (about 20 minutes; writes results/montezuma_test_set.npz)
+Run it with:   .venv/bin/python test_set.py     (about 25 minutes; writes results/montezuma_test_set.npz)
 """
 
 from multiprocessing import Pool
@@ -34,8 +40,9 @@ from game import BUTTONS, ROOM_BYTE, change
 from learners import LEARNERS
 
 TEST_SET_FILE = "results/montezuma_test_set.npz"
-EXPLORERS = (("cell counts", 101), ("cell counts", 102), ("uniform choice", 103), ("uniform choice", 104))
-EXPLORER_FRAMES = 16_000_000
+EXPLORERS = tuple(("cell counts", seed) for seed in (101, 102, 103, 104)) + \
+    tuple(("uniform choice", seed) for seed in (105, 106, 107, 108))
+EXPLORER_FRAMES = 24_000_000
 PLACES_PER_ROOM = 100
 
 
@@ -55,7 +62,10 @@ class TestSet:
         return len(self.button)
 
     def room_squared_misses(self, guessed_change):
-        """[room, moving byte]: the squared miss of these guessed changes (one row per test step), averaged in each room."""
+        """[room, moving byte]: the squared miss of these guessed changes, averaged in each room.
+
+        guessed_change has one row per test step and one column per moving byte.
+        """
         squared = (guessed_change - self.true_change).astype(float) ** 2
         return np.array([squared[self.room == room].mean(axis=0) for room in self.rooms])
 
@@ -110,7 +120,7 @@ def build():
     with Pool(len(EXPLORERS)) as pool:
         parts = pool.starmap(explore_and_press, EXPLORERS)
     before, button, after = (np.concatenate(part) for part in zip(*parts))
-    # Pooled over the explorers, a room can have up to 4 x PLACES_PER_ROOM places. Keep PLACES_PER_ROOM,
+    # Pooled over the explorers, a room can have up to 8 x PLACES_PER_ROOM places. Keep PLACES_PER_ROOM,
     # each with its 18 presses together, so that every room is tested on at most the same number of places.
     rng = np.random.default_rng(0)
     place = np.arange(len(button)) // BUTTONS

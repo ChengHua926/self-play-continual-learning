@@ -114,6 +114,7 @@ def press_randomly(game, rng, places, presses, stop_at_lost_life):
             lives = game.lives()
             press += 1
             continue
+        lives = game.lives()  # a life gained (it can happen) must not hide the next death
         code = game.screen_code()
         met.add(code)
         if code in places.index:

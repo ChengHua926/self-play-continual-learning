@@ -14,8 +14,9 @@ Checks with answers we know. Each must pass, or the setup has a mistake to find 
 
 Is there room to win? Not a check with a known answer:
     room oracle         knows more than uniform choice in at least 7 of 10 runs
-If even a rule that uses the room numbers cannot beat uniform choice, no learner can be
-expected to, and the full comparison is not worth running at this budget.
+If even this rule, which uses the room numbers, cannot beat uniform choice, a fair learner is
+unlikely to, and the full comparison is probably not worth running at this budget. (The oracle
+is one rule of thumb, under the same candidates as every rule, so it does not prove the limit.)
 
 Reported as a result, not a check: cell counts against uniform choice.
 The report also shows, for each rule, rooms reached, when it left the first room, places saved,
