@@ -33,7 +33,7 @@ RESULTS_FILE = "results/game_comparison.npz"
 END = 5            # "the end" is the average of the last 5 measurements
 EARLY = 2_000_000  # frames
 WINS_NEEDED = 7    # of the 10 runs
-FLAG_BELOW = 0.05  # flagged if its average end knowledge is more than 5% below uniform choice's
+FLAG_BELOW = 0.05  # flagged if its average whole-run knowledge is more than 5% below uniform choice's
 FAMILIES = {
     "baselines": ("uniform choice", "random play", "do-nothing critic"),
     "novelty": ("cell counts", "feature novelty", "feature novelty x steepness", "random-network novelty",
