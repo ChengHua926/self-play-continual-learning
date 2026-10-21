@@ -35,10 +35,11 @@ Only if GO, two controls run on the same five seeds, with the neighbours' settin
     batch agreement       weights from agreement with the whole batch instead of a group.
                           Reported, not a rule: it says whether finding the groups mattered.
 
-Cost, at 330,000 tokens a second for plain training (one pass, 20M tokens, takes a minute) and
-neighbours about 1.7 times slower (to be measured on the A100 before stage 1): with P = 16,
-stage 1 takes about 3.3 hours and stage 2 about 3.6 to 5.8, together about $14-18 at $1.99 an
-hour. The controls, if they run, add about 4.5 to 9 hours. With P = 32, about twice as long.
+Cost, measured on the A100 before stage 1: a plain step takes 87 ms and a neighbours step 178
+ms, so a pass over the 20M tokens takes about 1 minute plain and 2 minutes with neighbours.
+With P = 16, stage 1 takes about 3.5 to 4.5 hours and stage 2 about 4 to 6.5, together about
+$15-22 at $1.99 an hour; with P = 32, up to about 12 hours, $24. The controls, if they run,
+add about 5 to 10 hours.
 
 Run it with:   python run_comparison.py      (from the rereading folder, on the GPU machine)
 Each run is saved to results/comparison/ as it ends, with its settings and code version; running
