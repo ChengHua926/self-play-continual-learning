@@ -1,0 +1,24 @@
+The twin of the test set: 7,622 places (137,196 steps), 20% of them held out.
+Knowledge of the held-out places after 250, 500, 1,000, 2,000, 4,000, 8,000, 16,000, 24,000, 32,000, 40,000 training steps:
+  twin       13% 18% 26% 29% 38% 41% 40% 41% 40% 39%   best at 24,000
+  first room 25% 35% 44% 51% 51% 48% 46% 45% 43% 43%   best at 4,000
+
+Knowledge on the test set, room by room, at each model's best held-out point:
+
+ test room  test places  twin places    twin  first room   judged
+         0            5            2      6%          0%   no
+         1          100         2400     50%         47%   no
+         2          100         2400     36%          0%   yes
+         5          100          352     35%          4%   yes
+         6          100          336     41%          0%   yes
+         7          100          224     49%          0%   yes
+        12           37           66     26%          0%   yes
+        13          100         1001     37%          0%   yes
+        14          100          556     52%          0%   yes
+        21           47           84     38%          0%   yes
+        22          100          152     25%          0%   yes
+        23           50           49      3%          0%   yes
+       all                               33%          4%
+
+The rule: in every judged room (10), the twin model knows at least 10% more than the first-room model.
+Verdict: the world-model check FAILS.

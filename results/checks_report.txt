@@ -1,0 +1,16 @@
+Knowledge averaged over the whole run, and at the end; rooms reached by the end; when the first room
+was left (median over the runs that left it); places saved; training steps.
+
+                 whole run     end  rooms  left room 1  places  training
+uniform choice        7.5%   13.2%    6.5    2.8M (10)    1687    40,013
+random play           2.0%    1.6%    1.0        never     206    40,006
+most visited          2.8%    3.9%    3.1     6.6M (6)     699    40,010
+room oracle          11.4%   22.2%   10.0    2.8M (10)    2297    40,010
+cell counts           8.5%   12.0%    6.1    1.6M (10)    1803    40,009
+
+Checks with answers we know (whole-run knowledge, runs of 10):
+  exploring matters: uniform choice knows more than random play in 10 of 10 runs: PASSES
+  choosing matters: uniform choice knows more than most visited in 10 of 10 runs: PASSES
+
+Is there room to win? The room oracle knows more than uniform choice in 10 of 10 runs: yes.
+Result: cell counts knows more than uniform choice in 6 of 10 runs (8.5% against 7.5% over the whole run; at the end 12.0% against 13.2%).
