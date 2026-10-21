@@ -3,3 +3,6 @@ __pycache__/
 .venv/
 results/*_runs/
 results/game_comparison.log
+data/
+rereading/results/**/*.pt
+rereading/*.log
