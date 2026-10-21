@@ -1,0 +1,30 @@
+Knowledge over the whole run, at the end and early (2 million frames); frames saved against uniform
+choice; runs of 10 above uniform choice over the whole run; rooms reached by the end; when the first
+room was left (median, and how many of the 10 runs left it).
+
+                                     whole run    end  early  frames saved  above uniform  rooms  left room 1
+baselines
+  uniform choice                          7.5%  13.2%   3.8%           +0%              -    6.5    2.8M (10)
+  random play                             2.0%   1.6%   1.9%         never           0/10    1.0        never
+  do-nothing critic                       6.0%  11.0%   3.4%         never           2/10    6.3    3.7M (10)
+novelty
+  cell counts                             8.5%  12.0%   6.0%         never           6/10    6.1    1.6M (10)
+  feature novelty                        10.1%  14.7%   6.0%          +31%           9/10    6.4    1.3M (10)
+  feature novelty x steepness             8.8%  12.5%   5.8%         never           9/10    5.7    1.7M (10)
+  random-network novelty                 10.7%  19.1%   4.4%          +37%           8/10    9.4    2.3M (10)
+  random-network novelty x steepness      7.2%  11.8%   4.0%         never           6/10    5.3     2.9M (9)
+uncertainty
+  ensemble disagreement                   8.1%  14.1%   4.2%          +10%           6/10    6.3    2.3M (10)
+  disagreement x steepness                6.7%  11.2%   4.0%         never           3/10    5.9    3.7M (10)
+  pinned weights                          5.9%  11.4%   3.5%         never           2/10    5.5    4.0M (10)
+  steepness                               4.6%   7.9%   3.1%         never           0/10    6.0    3.8M (10)
+critics
+  raw error critic                       10.0%  15.2%   5.1%          +30%          10/10    8.1    1.7M (10)
+  progress over 10 rounds critic          6.7%  12.2%   3.5%         never           2/10    6.9    3.4M (10)
+  new places found critic                 8.5%  13.1%   5.4%         never           7/10    6.5    2.3M (10)
+  disagreement found critic               9.3%  16.1%   3.9%          +26%           7/10    7.5    2.0M (10)
+
+Verdict, by the rules fixed before the run
+  Works (whole-run knowledge above uniform choice's in at least 7 of 10 runs): feature novelty; feature novelty x steepness; random-network novelty; raw error critic; new places found critic; disagreement found critic.
+  Flagged (average whole-run knowledge more than 5% below uniform choice's): random play; do-nothing critic; disagreement x steepness; pinned weights; steepness; progress over 10 rounds critic.
+  Luck: with no real difference, 7 or more of 10 runs happen 17% of the time, so among 15 learners about 2.6 would work by luck alone.
