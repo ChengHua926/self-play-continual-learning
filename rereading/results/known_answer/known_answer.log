@@ -1,0 +1,17 @@
+weight decay 0.1, 4 passes: held-out loss at the end 5.003 (best along the way 5.053), 4 minutes
+weight decay 0.1, 8 passes: held-out loss at the end 4.671 (best along the way 4.744), 7 minutes
+weight decay 0.1, 16 passes: held-out loss at the end 4.758 (best along the way 4.752), 14 minutes
+weight decay 0.1, 32 passes: held-out loss at the end 5.059 (best along the way 4.749), 29 minutes
+weight decay 0.8, 4 passes: held-out loss at the end 4.872 (best along the way 4.926), 4 minutes
+weight decay 0.8, 8 passes: held-out loss at the end 4.618 (best along the way 4.679), 7 minutes
+weight decay 0.8, 16 passes: held-out loss at the end 4.548 (best along the way 4.615), 14 minutes
+weight decay 0.8, 32 passes: held-out loss at the end 4.633 (best along the way 4.699), 29 minutes
+
+Held-out loss at the end of each run (nats per token):
+  weight decay       4       8      16      32   passes
+           0.1   5.003   4.671   4.758   5.059
+           0.8   4.872   4.618   4.548   4.633
+
+1. With weight decay 0.1, 32 passes end 0.388 above the best 0.1 run (rule: at least 0.05): PASSES
+2. The best 0.8 run ends 0.123 below the best 0.1 run (rule: at least 0.02): PASSES
+Not a rule: the best number of passes is 8 with weight decay 0.1 and 16 with 0.8 (Kim et al.: 8 and 16).
