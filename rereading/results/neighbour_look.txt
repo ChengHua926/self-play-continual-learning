@@ -1,0 +1,18 @@
+look_at_neighbours.py on the A100, 2026-10-21 about 19:49 EDT, before the comparison
+(settings fixed in run_comparison.NEIGHBOURS: 2.0 standard deviations, centred; batch 64;
+checkpoints of the known-answer check's weight-decay-0.8, 32-pass run):
+
+After  1 passes: weights carry over between batches r = +0.88; no neighbour 22% (ok), batches with no neighbour at all 0 of 32; pairs changed by bfloat16 0.0% (ok)
+After  4 passes: weights carry over between batches r = +0.91; no neighbour 28% (ok), batches with no neighbour at all 0 of 32; pairs changed by bfloat16 0.2% (ok)
+After 16 passes: weights carry over between batches r = +0.88; no neighbour 23% (ok), batches with no neighbour at all 0 of 32; pairs changed by bfloat16 0.0% (ok)
+After 32 passes: weights carry over between batches r = +0.83; no neighbour 26% (ok), batches with no neighbour at all 0 of 32; pairs changed by bfloat16 1.5% (ok)
+
+Rule 2 holds: the comparison can run, with bfloat16.
+
+Speed check on the A100, the same evening, batch 64: plain 87 ms a step, 374,910 tokens/s,
+peak memory 24.8 GB; neighbours 178 ms a step, 183,882 tokens/s, peak memory 24.8 GB.
+
+Reproducibility test on the A100, the same evening: with PyTorch's default GPU kernels, two
+30-step runs of the same code and seed first differ at the second step and are up to 0.0585
+apart by step 30; with torch.use_deterministic_algorithms(True) they are identical at every
+step, at about 1.11 times the step time. All three weighting methods also repeat exactly.
