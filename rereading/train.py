@@ -21,6 +21,10 @@ of passes is a setting to tune, like the weight decay. The best held-out loss al
 recorded too.
 """
 
+import os
+
+os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")  # before the GPU starts: repeatable matrix products
+
 import math
 import time
 from dataclasses import asdict, dataclass
@@ -30,6 +34,13 @@ import torch
 
 import updates
 from model import CONTEXT, GPT
+
+# On a GPU, the same seed gives exactly the same run. By default a few GPU operations (the
+# embedding's gradient, attention's backward pass) add numbers in whatever order the hardware
+# finishes them, and two runs with the same seed then drift apart: by up to 0.06 in loss within
+# 30 steps, measured on the A100. Deterministic mode fixes the order, for about 11% more time.
+if torch.cuda.is_available():
+    torch.use_deterministic_algorithms(True)
 
 TRAINING_FILE = "../data/tokens/training.npy"
 HELD_OUT_FILE = "../data/tokens/held_out.npy"

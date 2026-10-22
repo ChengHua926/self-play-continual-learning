@@ -13,8 +13,8 @@ seeds (0 to 4), so neither is tuned on the runs that judge it.
 Stage 1, tuning, seed 100:
     - The known-answer check's runs (weight decay 0.1 and 0.8, at 4, 8, 16 and 32 passes) are
       reused if one of them, run again under this code, ends within SAME_RERUN of its saved
-      result; otherwise all are run again. (The code changed after they started, but only in
-      the neighbour parts, which plain training never runs.)
+      result; otherwise all are run again. (They ran before train.py switched the GPU to its
+      deterministic mode, so a rerun is not expected to match, and they will be run again.)
     - Weight decay 1.6 and 3.2 at 16 and 32 passes; if 3.2 is best, also 6.4 (the top of Kim et
       al.'s grid). The tuned weight decay and its passes P are the pair that ends lowest.
     - One run at learning rate 6e-3 (Kim et al.'s best, 3e-3, was the top of their grid): if it
@@ -36,7 +36,8 @@ Only if GO, two controls run on the same five seeds, with the neighbours' settin
                           Reported, not a rule: it says whether finding the groups mattered.
 
 Cost, measured on the A100 before stage 1: a plain step takes 87 ms and a neighbours step 178
-ms, so a pass over the 20M tokens takes about 1 minute plain and 2 minutes with neighbours.
+ms, so a pass over the 20M tokens takes about 1 minute plain and 2 minutes with neighbours;
+deterministic mode (train.py) adds about 11%.
 With P = 16, stage 1 takes about 3.5 to 4.5 hours and stage 2 about 4 to 6.5, together about
 $15-22 at $1.99 an hour; with P = 32, up to about 12 hours, $24. The controls, if they run,
 add about 5 to 10 hours.
