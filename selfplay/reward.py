@@ -32,8 +32,14 @@ Two other ways to get it were exact but slower on the GPU, and one was not exact
 
 loss_delta, one of the authors' comparison rewards, uses the realized change instead: the
 output's loss before the learner's step minus its loss after, as an absolute value (train.py).
+
+Two rewards of ours, for comparison with the paper's (train.py):
+    novelty           how far an output is from the outputs seen before, in the learner's own
+                      features (novelty below), as in our game comparison, where it was the winner
+    prediction_error  the learner's loss on the output after its step (sequence_losses)
 """
 
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -108,3 +114,73 @@ def alignment(learner, rows, along, where):
                 hook.remove()
         slopes.append(slope.abs())
     return torch.cat(slopes)
+
+
+# Feature novelty. NEAREST, SEEN and a memory that is an even sample of everything seen are as in
+# our game comparison (measures.py, learners.py, world_model.Replay). Unlike the game, an output is
+# a whole row of 4,095 bytes, mostly zero padding when a program writes little, and its feature is
+# the average over all of them, as the learner's loss and the paper's reward also average over all.
+NEAREST = 5           # the reward is the average distance to this many nearest outputs
+SEEN = 10_000         # earlier outputs drawn each round to compare with
+MEMORY = 65_536       # outputs kept: an even random sample of every output trained on so far
+
+
+@torch.no_grad()
+def features(model, rows, where):
+    """[row, width]: the model's last hidden layer (what its final norm puts out), averaged over
+    each row's positions, in 32-bit arithmetic."""
+    if len(rows) == 0:
+        return torch.zeros(0, model.width, device=where)
+    found = []
+    hook = model.ln_f.register_forward_hook(lambda layer, inputs, output: found.append(output.mean(dim=1)))
+    try:
+        for part in rows.to(where).split(CHUNK):
+            model(part[:, :-1])
+    finally:
+        hook.remove()
+    return torch.cat(found)
+
+
+def novelty(learner, rows, seen, where):
+    """[row]: the average distance, in the learner's features as they are now, from each output to
+    its NEAREST closest outputs among `seen` (earlier ones) and the rest of this round's."""
+    new, old = features(learner, rows, where), features(learner, seen, where)
+    # Exact differences, not cdist's faster |a|^2 + |b|^2 - 2ab: the features are about 8 long and,
+    # early in training, closer together than that form resolves in 32 bits (off by 2e-3 at 1e-2).
+    distances = torch.cdist(new, torch.cat([old, new]), compute_mode="donot_use_mm_for_euclid_dist")
+    itself = torch.arange(len(new), device=where)
+    distances[itself, len(old) + itself] = float("inf")       # an output is not compared with itself
+    return distances.topk(NEAREST, dim=1, largest=False).values.mean(dim=1)
+
+
+class SeenOutputs:
+    """An even random sample of every output the learner has trained on, up to `size`.
+
+    Each new output replaces a random kept one with the right probability, so that every output
+    ever seen is equally likely to be kept (reservoir sampling, as world_model.Replay does). A
+    window of recent outputs instead would count a program the replay bank brings back from long
+    ago as new again.
+    """
+
+    def __init__(self, length, size=MEMORY):
+        self.rows = np.zeros((size, length), dtype=np.uint8)
+        self.seen = 0   # outputs offered so far
+        self.kept = 0   # outputs held now
+
+    def add(self, outputs, rng):
+        for row in outputs:
+            if self.kept < len(self.rows):
+                slot = self.kept
+                self.kept += 1
+            else:
+                slot = rng.integers(self.seen + 1)
+            if slot < len(self.rows):
+                self.rows[slot] = row
+            self.seen += 1
+
+    def draw(self, count, rng):
+        """Up to `count` of the kept outputs, drawn without repeats, as learner rows."""
+        if self.kept == 0:
+            return torch.zeros(0, self.rows.shape[1], dtype=torch.long)
+        chosen = rng.choice(self.kept, size=min(count, self.kept), replace=False)
+        return torch.from_numpy(self.rows[chosen].astype(np.int64))

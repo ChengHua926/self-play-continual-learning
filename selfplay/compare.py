@@ -12,6 +12,10 @@ self-play has by round 2048 (1,024 programs per round against 1,536).
                   our uniform seeds
     ablations     shuffle or loss_delta counts as worse than self-play only if both its seeds are
                   above both self-play seeds, on audio 8-bit (and, second, on DNA)
+    our rewards   novelty or prediction_error counts as better than self-play only if both its
+                  seeds are below both self-play seeds, and as worse only if both are above; on
+                  audio 8-bit (and, second, on DNA). The same against uniform. (Added before
+                  these two arms ran.)
 
 Run it with:   ../.venv/bin/python compare.py <folder holding the run folders>
 """
@@ -25,7 +29,7 @@ import numpy as np
 CORPORA = ("dclm_ranked", "dna", "audio_8bit", "audio_16bit")
 LAST = {"uniform": (2560, 2816, 3072)}
 DEFAULT_LAST = (1536, 1792, 2048)
-ARMS = ("self-play", "uniform", "shuffle", "loss_delta")
+ARMS = ("self-play", "uniform", "shuffle", "loss_delta", "novelty", "prediction_error")
 RESULTS = Path(__file__).resolve().parent / "results"
 
 
@@ -45,7 +49,7 @@ def main(folder):
     released = json.loads((RESULTS / "released_99k_round_2048.json").read_text())
     print("Scores, bits per byte (lower is better), each the mean of the last three checkpoints")
     for corpus in CORPORA:
-        row = "   ".join(f"{arm} " + "/".join(f"{s[corpus]:.2f}" for s in ours[arm].values()) for arm in ARMS)
+        row = "   ".join(f"{arm} " + "/".join(f"{s[corpus]:.2f}" for s in ours[arm].values()) for arm in ARMS if ours[arm])
         print(f"   {corpus:12s} {row}")
 
     print("Gate: our uniform seeds at round 2048 against the released uniform seeds")
@@ -74,6 +78,26 @@ def main(folder):
             worse = len(values) == 2 and min(values) > worst_self_play
             print(f"   {arm:10s} {corpus:12s} " + "/".join(f"{v:.2f}" for v in values) +
                   f" against self-play at most {worst_self_play:.2f}: {'worse' if worse else 'not shown worse'}")
+
+    print("Our rewards: better or worse only if both seeds are beyond both seeds of the arm compared with")
+    for arm in ("novelty", "prediction_error"):
+        if not ours[arm]:
+            continue
+        for corpus in ("audio_8bit", "dna"):
+            values = [s[corpus] for s in ours[arm].values()]
+            for other in ("self-play", "uniform"):
+                theirs = [s[corpus] for s in ours[other].values()]
+                if len(values) != 2 or len(theirs) != 2:
+                    print(f"   {arm:16s} {corpus:12s} against {other}: a seed is missing")
+                    continue
+                if max(values) < min(theirs):
+                    verdict = "better"
+                elif min(values) > max(theirs):
+                    verdict = "worse"
+                else:
+                    verdict = "not shown different"
+                print(f"   {arm:16s} {corpus:12s} " + "/".join(f"{v:.2f}" for v in values) +
+                      f" against {other} " + "/".join(f"{v:.2f}" for v in theirs) + f": {verdict}")
 
 
 if __name__ == "__main__":

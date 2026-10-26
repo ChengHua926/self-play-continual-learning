@@ -20,6 +20,9 @@ The arms (Run.arm):
                  anything about its program but keeps the same spread
     loss_delta   the reward is |loss before the learner's step - loss after|: the change over the
                  same step that the paper's last_step reward looks along
+Two arms of ours swap only the reward (reward.py):
+    novelty           how far the output is from the outputs seen before, in the learner's features
+    prediction_error  the learner's loss on the output after its step
 
 The paper does not give most training settings. These were read off the authors' released
 weights for the 99k model (round 0, then every 256 rounds):
@@ -75,7 +78,7 @@ from model import CONTEXT, VOCABULARY, ByteModel
 if torch.cuda.is_available():
     torch.use_deterministic_algorithms(True)
 
-ARMS = ("self-play", "uniform", "shuffle", "loss_delta")
+ARMS = ("self-play", "uniform", "shuffle", "loss_delta", "novelty", "prediction_error")
 FRESH, MUTANT, REPLAY = 0, 1, 2   # what each program in the pool is
 CLIP = 1.0                        # GUESS: largest gradient length, for both models
 EXPERT_WEIGHT = 1.0               # lambda_EI in the paper
@@ -215,6 +218,7 @@ def train(run, folder, where=None, scores=True):
     generator_optimizer = torch.optim.AdamW(generator.parameters(), lr=run.learning_rate * run.generator_ratio,
                                             betas=betas, weight_decay=0.0)
     archive, bank, then = Archive(), ReplayBank(), {}   # then: the learner's weights after each recent round's step
+    memory = reward.SeenOutputs(CONTEXT, reward.MEMORY) if run.arm == "novelty" else None   # outputs seen so far
     record = {"run": asdict(run), "rounds": {key: [] for key in (
         "loss", "reward_mean", "reward_spread", "reward_largest", "fresh_symbols", "fresh_kl",
         "wrote_something", "bytes_written", "loop_depth", "niches", "seconds")}, "scores": {}}
@@ -229,6 +233,8 @@ def train(run, folder, where=None, scores=True):
         generator_optimizer.load_state_dict(state["generator_optimizer"])
         archive.niches, bank.programs, bank.sampled_log_probs = state["niches"], state["bank"], state["bank_log_probs"]
         then, record, first = state["then"], state["record"], state["round"] + 1
+        if memory is not None:
+            memory.rows, memory.seen, memory.kept = state["memory"]
         record["run"] = asdict(run)
         rng.bit_generator.state = state["numpy_rng"]
         torch.set_rng_state(state["torch_rng"].cpu())
@@ -256,6 +262,11 @@ def train(run, folder, where=None, scores=True):
             rewards = reward.alignment(learner, rows, along, where)
         elif run.arm == "loss_delta":
             rewards = (before - reward.sequence_losses(learner, rows, where)).abs()
+        elif run.arm == "novelty":
+            rewards = reward.novelty(learner, rows, memory.draw(reward.SEEN, rng), where)
+            memory.add(outputs, rng)
+        elif run.arm == "prediction_error":
+            rewards = reward.sequence_losses(learner, rows, where)
         if run.arm == "shuffle":
             rewards = rewards[torch.from_numpy(rng.permutation(len(rewards))).to(where)]
 
@@ -294,6 +305,7 @@ def train(run, folder, where=None, scores=True):
                      "generator_optimizer": generator_optimizer.state_dict(),
                      "niches": archive.niches, "bank": bank.programs, "bank_log_probs": bank.sampled_log_probs,
                      "then": then, "record": record, "round": round_, "numpy_rng": rng.bit_generator.state,
+                     "memory": (memory.rows, memory.seen, memory.kept) if memory is not None else None,
                      "torch_rng": torch.get_rng_state(), "device_rng": device_rng_state(where)}
             save_safely(lambda path: torch.save(state, path), folder / STATE_FILE)
             save_safely(lambda path: path.write_text(json.dumps(record)), folder / "record.json")

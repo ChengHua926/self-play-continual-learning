@@ -8,6 +8,7 @@ those are not in data/selfplay/weights.
 import math
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 import numpy as np
@@ -179,6 +180,52 @@ class RewardTests(unittest.TestCase):
         along = reward.direction(learner, optimizer, reward.snapshot(learner))
         self.assertEqual(reward.alignment(learner, rows, along, CPU).abs().max().item(), 0)
 
+    def test_novelty_is_zero_for_an_output_seen_often_enough(self):
+        torch.manual_seed(0)
+        learner = train.new_model(train.Run(), CPU)
+        rng = np.random.default_rng(0)
+        printing = [b"SX[.+]F", b"S++[.>+<]F"]
+        rows = torch.from_numpy(machine.run(printing, rng.integers(0, 2 ** 63, size=2), STEPS, TAPE)[0].astype(np.int64))
+        seen = rows[:1].repeat(reward.NEAREST, 1)          # the first output, NEAREST times
+        scores = reward.novelty(learner, rows, seen, CPU)
+        self.assertEqual(scores[0].item(), 0)
+        self.assertGreater(scores[1].item(), 0)
+
+    def test_novelty_distances_are_exact_for_close_outputs(self):
+        """40 outputs that differ in one byte have features far closer together than their length;
+        the distances must still come out right (checked against 64-bit arithmetic)."""
+        torch.manual_seed(0)
+        learner = train.new_model(train.Run(), CPU)
+        rng = np.random.default_rng(0)
+        row = machine.run([b"SX[.+]F"], rng.integers(0, 2 ** 63, size=1), STEPS, TAPE)[0][0].astype(np.int64)
+        rows = torch.from_numpy(np.tile(row, (40, 1)))
+        rows[:, 4000] = torch.arange(40)                   # the only difference
+        ours = reward.novelty(learner, rows, rows[:0], CPU)
+        f = reward.features(learner, rows, CPU).double()
+        distances = (f[:, None, :] - f[None, :, :]).pow(2).sum(-1).sqrt()
+        distances.fill_diagonal_(float("inf"))
+        exact = distances.topk(reward.NEAREST, dim=1, largest=False).values.mean(dim=1)
+        self.assertGreater(exact.min().item(), 0)
+        self.assertLess(((ours.double() - exact).abs() / exact).max().item(), 1e-3, (ours, exact))
+
+    def test_seen_outputs_keep_an_even_sample_of_everything(self):
+        memory = reward.SeenOutputs(2, size=4)
+        rng = np.random.default_rng(0)
+        for value in range(1, 4):                          # 6 rows into room for 4
+            memory.add(np.full((2, 2), value, dtype=np.uint8), rng)
+        self.assertEqual((memory.seen, memory.kept), (6, 4))
+        self.assertEqual(len(memory.draw(10, rng)), 4)
+        # Offer outputs 0 to 999 into room for 100: the ones kept should be spread over all of
+        # them (mean about 500), not bunched at the end as a window of recent ones would be (950).
+        means = []
+        for trial in range(50):
+            memory = reward.SeenOutputs(2, size=100)
+            numbers = np.arange(1000)
+            memory.add(np.stack([numbers // 256, numbers % 256], axis=1).astype(np.uint8), rng)
+            kept = memory.rows[:, 0].astype(int) * 256 + memory.rows[:, 1]
+            means.append(kept.mean())
+        self.assertLess(abs(np.mean(means) - 499.5), 20, np.mean(means))
+
 
 class TrainingTests(unittest.TestCase):
     def test_learning_rates_at_round_0_match_the_released_first_step(self):
@@ -209,6 +256,20 @@ class TrainingTests(unittest.TestCase):
             a = torch.load(Path(folder) / "whole" / "generator_0004.pth")["generator_state_dict"]
             b = torch.load(Path(folder) / "parts" / "generator_0004.pth")["generator_state_dict"]
             self.assertTrue(all(torch.equal(a[k], b[k]) for k in a))
+
+    def test_stopping_and_continuing_gives_the_same_run_for_our_arms(self):
+        """Novelty also has to carry its memory of the outputs seen across the stop. The memory is
+        made small here, so that it is full and replacing outputs by then."""
+        for arm in ("novelty", "prediction_error"):
+            small = dict(arm=arm, fresh=4, mutants=4, replay=4)
+            with tempfile.TemporaryDirectory() as folder, mock.patch.object(reward, "MEMORY", 20):
+                whole = train.train(train.Run(rounds=5, **small), Path(folder) / "whole", where=CPU, scores=False)
+                train.train(train.Run(rounds=3, **small), Path(folder) / "parts", where=CPU, scores=False)
+                parts = train.train(train.Run(rounds=5, **small), Path(folder) / "parts", where=CPU, scores=False)
+                for key in whole["rounds"]:
+                    if key != "seconds":
+                        self.assertEqual(whole["rounds"][key], parts["rounds"][key], (arm, key))
+                self.assertGreater(len(set(whole["rounds"]["reward_mean"])), 1, arm)
 
     @unittest.skipUnless((RELEASED / "learner_0000.pth").exists(), "released weights not downloaded")
     def test_starting_weights_look_like_the_released_ones(self):
