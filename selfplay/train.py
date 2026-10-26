@@ -35,6 +35,10 @@ weights for the 99k model (round 0, then every 256 rounds):
       rounds, so there is no weight decay.
     - The starting weights follow a normal distribution cut at 3 standard deviations. The standard
       deviation is 1 / sqrt(inputs) for each matrix and 1 / width for the embedding.
+    - Adam's beta2 is 0.999, PyTorch's default, calibrated on short runs: with 0.95 our learner moved
+      1.4-4.5 times as far as theirs on uniform programs, and our generator drifted twice as far
+      from g0 (64 nats at round 256, theirs 30-38). With 0.999 both match: generator 32 nats,
+      learner movement within about 20% of theirs in every weight group.
 The other settings are guesses, marked GUESS.
 
 Run it with:   ../.venv/bin/python train.py <folder> [setting=value ...] [--no-scores]
@@ -91,7 +95,7 @@ class Run:
     generator_ratio: float = 0.2  # the generator's learning rate over the learner's; read off their first step
     warmup: int = 50              # rounds; inferred, with the learning rate
     beta: float = 0.01            # GUESS: weight of the pull toward g0 (the KL term)
-    adam_beta2: float = 0.95      # GUESS (as in Kim et al.): Adam's averaging of squared gradients, both models
+    adam_beta2: float = 0.999     # Adam's averaging of squared gradients, both models; calibrated (see above)
     fresh: int = 512              # GUESS (the split of the pool of 1,536 the authors use)
     mutants: int = 512
     replay: int = 512
