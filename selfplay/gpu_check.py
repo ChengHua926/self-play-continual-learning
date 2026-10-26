@@ -1,8 +1,7 @@
 """The first thing to run on a new GPU: is the reward still exact there, and how long does a round take?
 
 1. The reward (reward.alignment) against the exact derivative from autograd, on 16 outputs after
-   a few learner steps. Checked twice: in plain 32-bit arithmetic, and with TF32 matrix products,
-   which are several times faster but keep only about 3 significant digits.
+   a few learner steps, and its time for a full pool.
 2. The seconds per round of each arm at full size (a pool of 1,536 programs). The first rounds
    have no mutants or replay yet, so rounds 3 to 5 are timed. The self-play run also scores its
    learner, so scoring is tried in the GPU's deterministic mode too.
@@ -45,17 +44,13 @@ for row in rows.to(where):
     F.cross_entropy(learner(row[None, :-1])[0].float(), row[1:]).backward()
     exact.append(abs(sum((p.grad * along[name]).sum() for name, p in learner.named_parameters()).item()))
 exact = torch.tensor(exact)
-for tf32 in (False, True):
-    torch.backends.cuda.matmul.allow_tf32 = tf32
-    ours = reward.alignment(learner, rows, along, where).cpu()
-    torch.cuda.synchronize()
-    started = time.time()
-    reward.alignment(learner, rows.repeat(8, 1), along, where)    # 128 rows, for the time
-    torch.cuda.synchronize()
-    error = ((ours - exact).abs() / exact.max()).max().item()
-    print(f"reward with TF32 {'on ' if tf32 else 'off'}: largest error / largest value {error:.1e}, "
-          f"{(time.time() - started) / 128 * 1536:.2f} s for a pool of 1,536", flush=True)
-torch.backends.cuda.matmul.allow_tf32 = False
+ours = reward.alignment(learner, rows, along, where).cpu()            # bfloat16, as in training
+torch.cuda.synchronize()
+started = time.time()
+reward.alignment(learner, rows.repeat(96, 1), along, where)    # a pool of 1,536 rows
+torch.cuda.synchronize()
+print(f"reward: largest error / largest value {((ours - exact).abs() / exact.max()).max().item():.1e}, "
+      f"{time.time() - started:.2f} s for a pool of 1,536", flush=True)
 
 for arm in train.ARMS:
     with tempfile.TemporaryDirectory() as folder:

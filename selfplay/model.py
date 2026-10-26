@@ -14,10 +14,6 @@ The parameter names match the authors' released checkpoints, so their weights lo
 A sequence starts with one tag byte: S for a program, O for a program's output. Program rows
 may only use the machine's 18 instructions and F, and nothing after the first F counts; output
 rows may use any byte (see allowed_logits).
-
-forward(tokens, plain=True) computes attention with plain matrix products instead of the fused
-kernel. The results are the same, but forward-mode differentiation, which the reward uses
-(reward.py), works through it on every device.
 """
 
 import math
@@ -38,9 +34,11 @@ class RMSNorm(nn.Module):
         super().__init__()
         self.weight = nn.Parameter(torch.ones(width))
 
+    def normalize(self, x):
+        return (x.float() * torch.rsqrt(x.float().pow(2).mean(-1, keepdim=True) + 1e-5)).to(x.dtype)
+
     def forward(self, x):
-        normed = x.float() * torch.rsqrt(x.float().pow(2).mean(-1, keepdim=True) + 1e-5)
-        return self.weight * normed.to(x.dtype)
+        return self.weight * self.normalize(x)
 
 
 def rotate(x, cos, sin):
@@ -59,7 +57,7 @@ class Attention(nn.Module):
         self.v_proj = nn.Linear(width, self.kv_heads * self.head_width, bias=False)
         self.o_proj = nn.Linear(heads * self.head_width, width, bias=False)
 
-    def forward(self, x, cos, sin, plain=False):
+    def forward(self, x, cos, sin):
         batch, length, width = x.shape
         q = self.q_proj(x).view(batch, length, self.heads, self.head_width).transpose(1, 2)
         k = self.k_proj(x).view(batch, length, self.kv_heads, self.head_width).transpose(1, 2)
@@ -67,12 +65,7 @@ class Attention(nn.Module):
         q, k = rotate(q, cos, sin), rotate(k, cos, sin)
         groups = self.heads // self.kv_heads
         k, v = k.repeat_interleave(groups, dim=1), v.repeat_interleave(groups, dim=1)
-        if plain:
-            scores = (q @ k.transpose(-2, -1)) * self.head_width ** -0.5
-            later = torch.ones(length, length, dtype=torch.bool, device=x.device).triu(1)
-            y = torch.softmax(scores.masked_fill(later, float("-inf")), dim=-1) @ v
-        else:
-            y = F.scaled_dot_product_attention(q, k, v, is_causal=True, scale=self.head_width ** -0.5)
+        y = F.scaled_dot_product_attention(q, k, v, is_causal=True, scale=self.head_width ** -0.5)
         return self.o_proj(y.transpose(1, 2).reshape(batch, length, width))
 
 
@@ -95,8 +88,8 @@ class Block(nn.Module):
         self.attn = Attention(width, heads)
         self.mlp = FeedForward(width)
 
-    def forward(self, x, cos, sin, plain=False):
-        x = x + self.attn(self.input_layernorm(x), cos, sin, plain)
+    def forward(self, x, cos, sin):
+        x = x + self.attn(self.input_layernorm(x), cos, sin)
         return x + self.mlp(self.post_attention_layernorm(x))
 
 
@@ -115,14 +108,14 @@ class ByteModel(nn.Module):
         allowed[list(INSTRUCTIONS) + [END]] = True
         self.register_buffer("program_vocab_mask", allowed)  # the name the released weights use
 
-    def forward(self, tokens, plain=False):
+    def forward(self, tokens):
         """[batch, length, 256]: next-byte logits, before allowed_logits."""
         angles = torch.outer(torch.arange(tokens.shape[1], device=tokens.device).float(), self.inv_freq)
         angles = torch.cat((angles, angles), dim=-1)[None, None]
         x = self.wte(tokens)
         cos, sin = angles.cos().to(x.dtype), angles.sin().to(x.dtype)
         for block in self.blocks:
-            x = block(x, cos, sin, plain)
+            x = block(x, cos, sin)
         return self.lm_head(self.ln_f(x))
 
 
