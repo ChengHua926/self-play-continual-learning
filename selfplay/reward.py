@@ -20,10 +20,9 @@ embedding (y = W[byte]) by U[byte]. Hooks compute the second factor in the forwa
 take the inner product when the backward pass reaches the layer. No output's own gradient is
 ever formed, and the attention keeps its fused kernel.
 
-The pass runs in 16-bit bfloat16 arithmetic, like the learner's own training pass (and, most
-likely, the authors' fused kernel). On the GPU that is 2.6 times faster than 32-bit, and the
-rewards stay within 0.5% of the largest one, in the same order (rank correlation 0.998 or more).
-The tests check the 32-bit version against autograd as well.
+The pass runs in 32-bit arithmetic. In 16-bit bfloat16, as the learner trains, it is 2.6 times
+faster, but once the learner has trained for 20 steps the rewards came out up to 16% of the
+largest reward off (1.6% for the median one), from the coarse 16-bit pass itself.
 
 Two other ways to get it were exact but slower on the GPU, and one was not exact:
     - forward-mode differentiation, as the authors do, through attention written out by hand: 4 s a round;
@@ -78,8 +77,8 @@ def direction(learner, optimizer, then):
     return result
 
 
-def alignment(learner, rows, along, where, precision=torch.bfloat16):
-    """[row]: |derivative of each output's loss along the direction `along`| (precision: bfloat16 or float32)."""
+def alignment(learner, rows, along, where):
+    """[row]: |derivative of each output's loss along the direction `along`|, exactly, in 32-bit arithmetic."""
     layers = {module: name for name, module in learner.named_modules()
               if isinstance(module, (nn.Linear, nn.Embedding, RMSNorm))}
     assert {name + ".weight" for name in layers.values()} == set(along), "every weight must be in one hooked layer"
@@ -97,14 +96,13 @@ def alignment(learner, rows, along, where, precision=torch.bfloat16):
                 moved = u * layer.normalize(x)
 
             def add(gradient):      # returns nothing, so the backward pass itself is unchanged
-                slope.add_((gradient.float() * moved.float()).flatten(1).sum(dim=1))
+                slope.add_((gradient * moved).flatten(1).sum(dim=1))
             output.register_hook(add)
 
         hooks = [layer.register_forward_hook(record) for layer in layers]
         try:
-            with torch.autocast(where.type, dtype=torch.bfloat16, enabled=precision == torch.bfloat16):
-                logits = learner(part[:, :-1])
-            torch.autograd.grad(per_row_losses(logits, part).sum(), list(learner.parameters()))
+            losses = per_row_losses(learner(part[:, :-1]), part)
+            torch.autograd.grad(losses.sum(), list(learner.parameters()))
         finally:
             for hook in hooks:
                 hook.remove()

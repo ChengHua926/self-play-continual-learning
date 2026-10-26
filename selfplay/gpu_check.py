@@ -44,7 +44,7 @@ for row in rows.to(where):
     F.cross_entropy(learner(row[None, :-1])[0].float(), row[1:]).backward()
     exact.append(abs(sum((p.grad * along[name]).sum() for name, p in learner.named_parameters()).item()))
 exact = torch.tensor(exact)
-ours = reward.alignment(learner, rows, along, where).cpu()            # bfloat16, as in training
+ours = reward.alignment(learner, rows, along, where).cpu()
 torch.cuda.synchronize()
 started = time.time()
 reward.alignment(learner, rows.repeat(96, 1), along, where)    # a pool of 1,536 rows

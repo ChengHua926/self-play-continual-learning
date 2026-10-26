@@ -161,8 +161,7 @@ class RewardTests(unittest.TestCase):
             rows = torch.from_numpy(machine.run(programs, rng.integers(0, 2 ** 63, size=8), STEPS, TAPE)[0].astype(np.int64))
             train.learner_step(learner, optimizer, rows, CPU)
         along = reward.direction(learner, optimizer, start)
-        ours = reward.alignment(learner, rows, along, CPU, precision=torch.float32)
-        low = reward.alignment(learner, rows, along, CPU)                    # bfloat16, as in training
+        ours = reward.alignment(learner, rows, along, CPU)
         exact = []
         for row in rows:
             learner.zero_grad()
@@ -171,7 +170,6 @@ class RewardTests(unittest.TestCase):
         exact = torch.tensor(exact)
         self.assertGreater(len(set(exact.tolist())), 4)
         self.assertLess(((ours - exact).abs() / exact.max()).max().item(), 1e-4, (ours, exact))
-        self.assertLess(((low - exact).abs() / exact.max()).max().item(), 2e-2, (low, exact))
 
     def test_no_movement_gives_no_reward(self):
         torch.manual_seed(0)
