@@ -29,7 +29,7 @@ steps, tape = machine.limits(64, 1)
 
 torch.manual_seed(0)
 learner = train.new_model(train.Run(), where)
-optimizer = torch.optim.AdamW(learner.parameters(), lr=1e-2, betas=train.BETAS, weight_decay=0.0)
+optimizer = torch.optim.AdamW(learner.parameters(), lr=1e-2, betas=(0.9, train.Run().adam_beta2), weight_decay=0.0)
 rng = np.random.default_rng(0)
 start = reward.snapshot(learner)
 printing = [b"SX[.+]F", b"S,[.,]F", b"S++[.>+<]F", b"SX[>+.<-]F"]

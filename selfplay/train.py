@@ -73,7 +73,6 @@ if torch.cuda.is_available():
 
 ARMS = ("self-play", "uniform", "shuffle", "loss_delta")
 FRESH, MUTANT, REPLAY = 0, 1, 2   # what each program in the pool is
-BETAS = (0.9, 0.95)               # GUESS, as in Kim et al., whose tuning method the paper follows
 CLIP = 1.0                        # GUESS: largest gradient length, for both models
 EXPERT_WEIGHT = 1.0               # lambda_EI in the paper
 SAVE_EVERY = 256                  # rounds, as in the released checkpoints
@@ -92,6 +91,7 @@ class Run:
     generator_ratio: float = 0.2  # the generator's learning rate over the learner's; read off their first step
     warmup: int = 50              # rounds; inferred, with the learning rate
     beta: float = 0.01            # GUESS: weight of the pull toward g0 (the KL term)
+    adam_beta2: float = 0.95      # GUESS (as in Kim et al.): Adam's averaging of squared gradients, both models
     fresh: int = 512              # GUESS (the split of the pool of 1,536 the authors use)
     mutants: int = 512
     replay: int = 512
@@ -206,9 +206,10 @@ def train(run, folder, where=None, scores=True):
     torch.manual_seed(run.seed)
     rng = np.random.default_rng(run.seed)
     learner, generator = new_model(run, where), new_model(run, where)
-    learner_optimizer = torch.optim.AdamW(learner.parameters(), lr=run.learning_rate, betas=BETAS, weight_decay=0.0)
+    betas = (0.9, run.adam_beta2)
+    learner_optimizer = torch.optim.AdamW(learner.parameters(), lr=run.learning_rate, betas=betas, weight_decay=0.0)
     generator_optimizer = torch.optim.AdamW(generator.parameters(), lr=run.learning_rate * run.generator_ratio,
-                                            betas=BETAS, weight_decay=0.0)
+                                            betas=betas, weight_decay=0.0)
     archive, bank, then = Archive(), ReplayBank(), {}   # then: the learner's weights after each recent round's step
     record = {"run": asdict(run), "rounds": {key: [] for key in (
         "loss", "reward_mean", "reward_spread", "reward_largest", "fresh_symbols", "fresh_kl",

@@ -152,7 +152,7 @@ class RewardTests(unittest.TestCase):
         """After some real training, the reward is |<gradient of the loss, direction>| from autograd."""
         torch.manual_seed(0)
         learner = train.new_model(train.Run(), CPU)
-        optimizer = torch.optim.AdamW(learner.parameters(), lr=1e-2, betas=train.BETAS, weight_decay=0.0)
+        optimizer = torch.optim.AdamW(learner.parameters(), lr=1e-2, betas=(0.9, train.Run().adam_beta2), weight_decay=0.0)
         rng = np.random.default_rng(0)
         start = reward.snapshot(learner)
         printing = [b"SX[.+]F", b"S,[.,]F", b"S++[.>+<]F", b"SX[>+.<-]F"]   # programs whose outputs differ
@@ -223,7 +223,7 @@ class TrainingTests(unittest.TestCase):
         torch.manual_seed(0)
         run = train.Run()
         learner = train.new_model(run, CPU)
-        optimizer = torch.optim.AdamW(learner.parameters(), lr=train.learning_rate(0, run), betas=train.BETAS,
+        optimizer = torch.optim.AdamW(learner.parameters(), lr=train.learning_rate(0, run), betas=(0.9, train.Run().adam_beta2),
                                       weight_decay=0.0)
         rows = torch.from_numpy(machine.run(generator.uniform_programs(8, np.random.default_rng(0)),
                                             np.arange(8), STEPS, TAPE)[0].astype(np.int64))
