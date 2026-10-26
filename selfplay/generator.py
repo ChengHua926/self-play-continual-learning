@@ -2,6 +2,8 @@
 
 The generator is a ByteModel (model.py) that writes the tag S, then up to MAX_PROGRAM bytes from
 the 19-symbol alphabet, ending with F. It samples at temperature 1, as in Cowsik et al.
+Before a program's F, allowed_logits (model.py) leaves exactly these 19 symbols possible, so
+sample() and log_probs() keep only their 19 logits.
 
 The prior it is pulled toward, g0, gives a program of n symbols probability 19^-n: every
 symbol equally likely at every position, so short programs are much likelier than long ones.
@@ -16,7 +18,7 @@ import math
 import numpy as np
 import torch
 
-from model import END, INSTRUCTIONS, PROGRAM_TAG, allowed_logits
+from model import END, INSTRUCTIONS, PROGRAM_TAG
 
 MAX_PROGRAM = 255
 SYMBOLS = 19          # 18 instructions and F
@@ -30,9 +32,10 @@ def sample(generator, count, where):
     """A list of count programs, each as bytes: S, the symbols, then F (none if cut off)."""
     tokens = torch.full((count, 1), PROGRAM_TAG, dtype=torch.long, device=where)
     finished = torch.zeros(count, dtype=torch.bool, device=where)
+    alphabet = torch.tensor(ALPHABET, device=where)
     for _ in range(MAX_PROGRAM):
-        logits = allowed_logits(generator(tokens), tokens)[:, -1].float()
-        nxt = torch.multinomial(torch.softmax(logits, dim=-1), 1).squeeze(1)
+        logits = generator(tokens, last=True)[:, -1, ALPHABET].float()
+        nxt = alphabet[torch.multinomial(torch.softmax(logits, dim=-1), 1).squeeze(1)]
         nxt = torch.where(finished, torch.full_like(nxt, END), nxt)
         tokens = torch.cat([tokens, nxt[:, None]], dim=1)
         finished |= nxt == END

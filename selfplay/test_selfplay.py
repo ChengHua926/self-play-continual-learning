@@ -19,7 +19,7 @@ import generator
 import machine
 import reward
 import train
-from model import INSTRUCTIONS
+from model import INSTRUCTIONS, allowed_logits
 
 CPU = torch.device("cpu")
 RELEASED = Path(__file__).resolve().parent.parent / "data" / "selfplay" / "weights" / "100k" / "seed-40354564"
@@ -78,7 +78,7 @@ class GeneratorTests(unittest.TestCase):
             stepwise = 0.0
             for t in range(1, len(program)):
                 prefix = torch.tensor([list(program[:t])])
-                logits = generator.allowed_logits(self.model(prefix), prefix)[0, -1]
+                logits = allowed_logits(self.model(prefix), prefix)[0, -1]
                 stepwise += torch.log_softmax(logits, dim=-1)[program[t]].item()
             self.assertAlmostEqual(total, stepwise, places=3)
 

@@ -108,15 +108,16 @@ class ByteModel(nn.Module):
         allowed[list(INSTRUCTIONS) + [END]] = True
         self.register_buffer("program_vocab_mask", allowed)  # the name the released weights use
 
-    def forward(self, tokens):
-        """[batch, length, 256]: next-byte logits, before allowed_logits."""
+    def forward(self, tokens, last=False):
+        """[batch, length, 256]: next-byte logits, before allowed_logits. last: only the last
+        position's ([batch, 1, 256]), which is all sampling needs."""
         angles = torch.outer(torch.arange(tokens.shape[1], device=tokens.device).float(), self.inv_freq)
         angles = torch.cat((angles, angles), dim=-1)[None, None]
         x = self.wte(tokens)
         cos, sin = angles.cos().to(x.dtype), angles.sin().to(x.dtype)
         for block in self.blocks:
             x = block(x, cos, sin)
-        return self.lm_head(self.ln_f(x))
+        return self.lm_head(self.ln_f(x[:, -1:] if last else x))
 
 
 def allowed_logits(logits, tokens):

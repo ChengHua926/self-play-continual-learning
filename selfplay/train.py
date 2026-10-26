@@ -45,6 +45,10 @@ It saves into the folder and continues from the last saved state if there is one
 import os
 
 os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")  # before the GPU starts: repeatable matrix products
+# Let the GPU's memory cache grow in place. Sampling makes slightly bigger tensors at each of up to
+# 255 steps; without this, freed smaller blocks cannot be reused, and one run's cache swelled to
+# nearly the whole 80 GB GPU while it used under 6 GB.
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 
 import json
 import sys
