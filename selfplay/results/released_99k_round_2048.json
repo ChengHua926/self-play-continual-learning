@@ -1,0 +1,90 @@
+{
+ "self-play": {
+  "seed-40354564": {
+   "dclm_ranked": 6.4997,
+   "dna": 3.1772,
+   "audio_8bit": 3.9748,
+   "audio_16bit": 6.2528
+  },
+  "seed-40354565": {
+   "dclm_ranked": 5.979,
+   "dna": 3.2473,
+   "audio_8bit": 3.6692,
+   "audio_16bit": 6.6046
+  },
+  "seed-40354566": {
+   "dclm_ranked": 6.5489,
+   "dna": 3.4259,
+   "audio_8bit": 4.372,
+   "audio_16bit": 6.8293
+  },
+  "seed-40354567": {
+   "dclm_ranked": 6.3107,
+   "dna": 3.2097,
+   "audio_8bit": 3.3774,
+   "audio_16bit": 6.6448
+  },
+  "seed-40354568": {
+   "dclm_ranked": 7.2658,
+   "dna": 3.1508,
+   "audio_8bit": 3.7929,
+   "audio_16bit": 6.7463
+  },
+  "seed-40354569": {
+   "dclm_ranked": 6.3423,
+   "dna": 3.3695,
+   "audio_8bit": 3.4908,
+   "audio_16bit": 6.534
+  },
+  "seed-40354570": {
+   "dclm_ranked": 6.7595,
+   "dna": 3.19,
+   "audio_8bit": 3.8325,
+   "audio_16bit": 6.4612
+  },
+  "seed-40354571": {
+   "dclm_ranked": 6.1234,
+   "dna": 3.1762,
+   "audio_8bit": 3.3792,
+   "audio_16bit": 6.6596
+  },
+  "seed-40354572": {
+   "dclm_ranked": 7.3794,
+   "dna": 3.9334,
+   "audio_8bit": 4.2666,
+   "audio_16bit": 7.3463
+  },
+  "seed-40354573": {
+   "dclm_ranked": 5.9657,
+   "dna": 2.9839,
+   "audio_8bit": 4.0632,
+   "audio_16bit": 6.7981
+  }
+ },
+ "uniform": {
+  "seed-40354564": {
+   "dclm_ranked": 6.8738,
+   "dna": 3.7176,
+   "audio_8bit": 4.6432,
+   "audio_16bit": 6.937
+  },
+  "seed-40354565": {
+   "dclm_ranked": 6.1861,
+   "dna": 3.583,
+   "audio_8bit": 4.8973,
+   "audio_16bit": 6.939
+  },
+  "seed-40354566": {
+   "dclm_ranked": 6.4607,
+   "dna": 3.4438,
+   "audio_8bit": 4.4246,
+   "audio_16bit": 7.0448
+  },
+  "seed-40354567": {
+   "dclm_ranked": 6.1465,
+   "dna": 3.5815,
+   "audio_8bit": 4.5847,
+   "audio_16bit": 6.8324
+  }
+ }
+}

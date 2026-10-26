@@ -1,0 +1,26 @@
+{
+ "seed-40354564": {
+  "dclm_ranked": 6.7299,
+  "dna": 3.628,
+  "audio_8bit": 5.0941,
+  "audio_16bit": 7.1691
+ },
+ "seed-40354565": {
+  "dclm_ranked": 6.1254,
+  "dna": 3.582,
+  "audio_8bit": 4.3147,
+  "audio_16bit": 6.8595
+ },
+ "seed-40354566": {
+  "dclm_ranked": 6.553,
+  "dna": 3.6294,
+  "audio_8bit": 4.2083,
+  "audio_16bit": 6.9809
+ },
+ "seed-40354567": {
+  "dclm_ranked": 6.6021,
+  "dna": 4.989,
+  "audio_8bit": 4.3458,
+  "audio_16bit": 6.8102
+ }
+}

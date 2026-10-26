@@ -6,3 +6,6 @@ results/game_comparison.log
 data/
 rereading/results/**/*.pt
 rereading/*.log
+selfplay/results/**/*.pth
+selfplay/results/**/state.pt
+selfplay/results/**/*.log
