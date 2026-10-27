@@ -11,10 +11,14 @@ of the best sequence in the real world; then it plans again, starting from its l
 steps. A sequence scores 1 if it reaches success, plus a little for reaching it sooner, else 0.
 Each try gets k + 20 steps.
 
-The model is either the true world itself (the known-answer check, here: how far back planning with
-this reward can reach at all) or a trained world model.
+The model is either the true world itself (the known-answer check: how far back planning with this
+reward can reach at all) or a trained world model, which imagines each plan by feeding its predicted
+next state back in, step by step (its mean prediction), and checks success on the imagined states.
+Either way the chosen actions are done in the true world (our CPU copy, sim.Sim), and only success
+there counts.
 
-Run the known-answer check with:   ../.venv/bin/python plan.py [demos per k, default 20]
+Run it with:   ../.venv/bin/python plan.py [demos per k, default 20]                 (the true world)
+          or:  ../.venv/bin/python plan.py <world model .pt> [demos per k]         (a trained one)
 """
 
 import sys
@@ -23,9 +27,12 @@ from pathlib import Path
 
 import mujoco
 import numpy as np
+import torch
 
 from constants import TABLE_TOP
+from kinematics import HandFinder
 from sim import Sim
+from world_model import WorldModel
 
 DEMOS = Path(__file__).resolve().parent.parent / "data" / "robomimic" / "square_ph"
 KS = (5, 10, 15, 30)
@@ -69,6 +76,30 @@ def score_in_true_world(model, taken, plans):
     return scores
 
 
+def imagined_success(states, finder, peg):
+    """succeeded() for imagined states [n, 33]: the nut from the state, the hand from the arm's angles."""
+    nut, hand = states[:, 9:12], finder.hand(states[:, :7])
+    on_peg = ((nut[:, :2] - peg).abs() < 0.03).all(dim=1) & (nut[:, 2] < TABLE_TOP + 0.05)
+    return on_peg & (1 - torch.tanh(10 * (hand - nut).norm(dim=1)) < 0.6)
+
+
+@torch.no_grad()
+def score_in_world_model(model, finder, peg, state, plans):
+    """Each plan's score, imagined by the world model from this state."""
+    n, horizon = plans.shape[:2]
+    states = torch.tensor(state, dtype=torch.float64)[None, None].repeat(n, 1, 1)
+    actions = torch.tensor(plans, dtype=torch.float64)
+    scores, done = torch.zeros(n, dtype=torch.float64), torch.zeros(n, dtype=torch.bool)
+    for t in range(horizon):
+        mean, _ = model(states.float(), actions[:, :t + 1].float())
+        following = states[:, -1] + mean[:, -1].double() * model.change_spread.double()
+        states = torch.cat([states, following[:, None]], dim=1)
+        newly = imagined_success(following, finder, peg) & ~done
+        scores[newly] = 1 + (horizon - t) / horizon
+        done |= newly
+    return scores.numpy()
+
+
 def cross_entropy(score, horizon, rng, mean=None):
     """The best plan [horizon, 7] that the cross-entropy method finds for this scoring."""
     mean = np.zeros((horizon, 7)) if mean is None else mean
@@ -103,10 +134,15 @@ def success_steps():
 
 
 def one_try(task):
-    """One start, planned with the true world as the model: did it succeed?"""
-    step, k, seed = task
+    """One start, planned with the true world (checkpoint None) or a trained world model: did it succeed?"""
+    step, k, seed, checkpoint = task
     demos, carried = np.load(DEMOS / "demo_states.npz"), np.load(DEMOS / "test_steps.npz")
     real, model = Sim(), Sim()
+    if checkpoint is not None:
+        torch.set_num_threads(1)
+        learned = WorldModel(dict(np.load(Path(__file__).resolve().parent / "results" / "scales.npz")))
+        learned.load_state_dict(torch.load(checkpoint, map_location="cpu", weights_only=True))
+        finder, peg = HandFinder(real.model), torch.tensor(real.square_peg)
     put(real, (demos["states"][step - k], carried["seen"][step - k][16:18], np.zeros(real.model.nv)))
     rng = np.random.default_rng(seed)
     horizon = min(k + 5, 35)
@@ -114,7 +150,11 @@ def one_try(task):
     for _ in range(0, k + EXTRA_STEPS, DO_BEFORE_REPLANNING):
         taken = take(real)
         mean = None if plan is None else np.concatenate([plan[DO_BEFORE_REPLANNING:], np.zeros((DO_BEFORE_REPLANNING, 7))])
-        plan = cross_entropy(lambda plans: score_in_true_world(model, taken, plans), horizon, rng, mean)
+        if checkpoint is None:
+            score = lambda plans: score_in_true_world(model, taken, plans)
+        else:
+            score = lambda plans: score_in_world_model(learned, finder, peg, real.state(), plans)
+        plan = cross_entropy(score, horizon, rng, mean)
         for action in plan[:DO_BEFORE_REPLANNING]:
             real.step(action)
             if succeeded(real):
@@ -122,16 +162,21 @@ def one_try(task):
     return k, False
 
 
-def main(per_k):
+def main(per_k, checkpoint=None):
     steps = [s for s in success_steps() if s is not None]
-    tasks = [(step, k, 1000 * k + i) for k in KS for i, step in enumerate(steps[:per_k])]
+    tasks = [(step, k, 1000 * k + i, checkpoint) for k in KS for i, step in enumerate(steps[:per_k])]
     with Pool(WORKERS) as pool:
         results = pool.map(one_try, tasks)
-    print(f"Planning with the true world as the model, success or fail only ({per_k} demo starts per k):")
+    model = "the true world" if checkpoint is None else Path(checkpoint).name
+    print(f"Planning with {model} as the model, success or fail only ({per_k} demo starts per k):")
     for k in KS:
         wins = [won for kk, won in results if kk == k]
         print(f"   k = {k:2d} steps before the human's success: {np.mean(wins):.0%} succeeded ({sum(wins)} of {len(wins)})")
 
 
 if __name__ == "__main__":
-    main(int(sys.argv[1]) if len(sys.argv) > 1 else 20)
+    arguments = sys.argv[1:]
+    if arguments and arguments[0].endswith(".pt"):
+        main(int(arguments[1]) if len(arguments) > 1 else 20, arguments[0])
+    else:
+        main(int(arguments[0]) if arguments else 20)

@@ -20,13 +20,15 @@ TEST = Path(__file__).resolve().parent.parent / "data" / "robomimic" / "square_p
 
 
 class TestOne:
-    def __init__(self, device):
+    def __init__(self, device, demos=None):
+        """demos: which demos to use (indices), all 200 by default."""
         steps = np.load(TEST / "test_steps_gpu.npz")
         holding = np.load(TEST / "demo_states.npz")["holding"]
         pieces = []                     # (first step, length) of each piece of up to STEPS steps
         first = 0
-        for length in steps["lengths"]:
-            pieces += [(first + k, min(STEPS, length - k)) for k in range(0, length, STEPS)]
+        for index, length in enumerate(steps["lengths"]):
+            if demos is None or index in demos:
+                pieces += [(first + k, min(STEPS, length - k)) for k in range(0, length, STEPS)]
             first += length
         rows = np.array([[start + min(t, length - 1) for t in range(STEPS)] for start, length in pieces])
         self.used = torch.tensor(np.arange(STEPS)[None] < np.array([length for _, length in pieces])[:, None], device=device)

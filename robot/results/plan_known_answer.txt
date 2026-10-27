@@ -1,0 +1,5 @@
+Planning with the true world as the model, success or fail only (20 demo starts per k):
+   k =  5 steps before the human's success: 100% succeeded (20 of 20)
+   k = 10 steps before the human's success: 100% succeeded (20 of 20)
+   k = 15 steps before the human's success: 100% succeeded (20 of 20)
+   k = 30 steps before the human's success: 100% succeeded (20 of 20)

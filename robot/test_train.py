@@ -6,6 +6,7 @@ Run them with:   ../.venv/bin/python -m unittest test_train -v      (from the ro
 
 import unittest
 
+import mujoco
 import numpy as np
 import torch
 
@@ -14,6 +15,7 @@ import gpu_ways
 import reward as paper_reward
 import robot_machine
 import world_model
+from kinematics import HandFinder
 from robot_machine import NEEDED
 from sim import Sim
 
@@ -32,6 +34,18 @@ class TestDecoding(unittest.TestCase):
             q, expected_q = start["nut_quaternion"][i].numpy(), expected_start["nut_quaternion"]
             self.assertTrue(np.allclose(q, expected_q, atol=1e-9) or np.allclose(q, -expected_q, atol=1e-9))
             np.testing.assert_allclose(actions[i].numpy(), expected_actions, atol=1e-12)
+
+
+class TestKinematics(unittest.TestCase):
+    def test_hand_position_matches_mujoco(self):
+        sim = Sim()
+        finder = HandFinder(sim.model)
+        angles = np.random.default_rng(0).uniform(sim.arm_range[:, 0], sim.arm_range[:, 1], size=(50, 7))
+        ours = finder.hand(torch.tensor(angles)).numpy()
+        for a, mine in zip(angles, ours):
+            sim.data.qpos[sim.arm_q] = a
+            mujoco.mj_forward(sim.model, sim.data)
+            np.testing.assert_allclose(mine, sim.data.site_xpos[sim.hand_site], atol=1e-12)
 
 
 class TestReward(unittest.TestCase):

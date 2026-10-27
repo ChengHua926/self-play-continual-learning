@@ -16,3 +16,6 @@ selfplay/results/**/*.pth
 selfplay/results/**/state.pt
 selfplay/results/**/*.log
 .venv-robosuite/
+robot/results/*.pt
+robot/runs*/
+robot/runs*.log
