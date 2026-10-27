@@ -1,0 +1,7 @@
+Share of experiments in which each happened at least once (5000 experiments per way)
+   way                    touched      held    lifted  over peg    on peg   overlap   s each
+   peoples_way              1.72%     0.20%     0.04%     0.00%     1.00%    16.24%     0.23
+   peoples_way_at_nut      52.20%    29.72%     7.82%     0.02%     1.00%    16.24%     0.26
+   plain_random             0.28%     0.00%     0.00%     0.00%     0.04%    23.62%     0.66
+   human demos            100.00%   100.00%   100.00%   100.00%   100.00%   (200 demos)
+(seconds each: one experiment of 50 steps on one core, with 10 running at once)

@@ -1,0 +1,13 @@
+GPU world (MuJoCo Warp 3.17, one H100 PCIe), measured 2026-10-27 with gpu_speed.py:
+each copy runs one 50-step experiment from a random start with random actions (the most contacts).
+   1536 copies:    6.5 s = 237 experiments a second
+   4096 copies:    9.5 s = 432 experiments a second
+  16384 copies:   23.1 s = 710 experiments a second
+Physics alone (no controller), recorded as one graph: about 1,010 experiments a second at 16,384 copies.
+Without recording graphs it was 3 to 5 times slower; fewer solver iterations did not help.
+Most contacts at once: 17 a copy (room 256); most constraint rows in a copy: 236 (room 1024).
+
+Against our CPU copy (test_gpu.py), one control step: median 0.02 mm on demo steps (contact),
+0.0004 mm on random steps; largest 5.7 mm and 0.46 mm.
+Test 1 re-simulated in the GPU world (gpu_test_data.py): next states differ from robosuite's by a
+median 0.49 mm (99%: 1 cm), the same gap as between the two MuJoCo versions.
