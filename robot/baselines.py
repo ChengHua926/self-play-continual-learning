@@ -26,7 +26,7 @@ plain_random        random bytes for the whole experiment: a random start over t
 
 import numpy as np
 
-from machine import NEEDED, run, run_bytes
+from robot_machine import NEEDED, run, run_bytes
 from world import TABLE_TOP
 
 WAYPOINT_EVERY = 10
@@ -38,7 +38,9 @@ LARGEST_TURN = 0.5          # radians a step
 def widened_start(world, rng):
     default = world.default_start
     arm = np.clip(default["arm"] + rng.normal(0, 0.3, 7), world.arm_range[:, 0], world.arm_range[:, 1])
-    fingers = world.finger_range[:, 1] if rng.random() < 0.5 else world.finger_range[:, 0]
+    # The two fingers' joints run opposite ways: open is (high, low) of their ranges, closed (low, high).
+    opened, closed = world.finger_range[[0, 1], [1, 0]], world.finger_range[[0, 1], [0, 1]]
+    fingers = opened if rng.random() < 0.5 else closed
     yaw = rng.uniform(0, 2 * np.pi)
     return {"arm": arm, "fingers": fingers,
             "nut_position": np.array([*rng.uniform(-AREA, AREA, 2), default["nut_position"][2]]),

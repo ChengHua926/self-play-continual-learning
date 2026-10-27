@@ -83,8 +83,10 @@ def direction(learner, optimizer, then):
     return result
 
 
-def alignment(learner, rows, along, where):
-    """[row]: |derivative of each output's loss along the direction `along`|, exactly, in 32-bit arithmetic."""
+def alignment(learner, rows, along, where, losses_of=None):
+    """[row]: |derivative of each output's loss along the direction `along`|, exactly, in 32-bit arithmetic.
+    losses_of(learner, part) gives each row's loss; by default, the byte learner's (per_row_losses).
+    The robot world model (../robot) passes its own."""
     layers = {module: name for name, module in learner.named_modules()
               if isinstance(module, (nn.Linear, nn.Embedding, RMSNorm))}
     assert {name + ".weight" for name in layers.values()} == set(along), "every weight must be in one hooked layer"
@@ -107,7 +109,7 @@ def alignment(learner, rows, along, where):
 
         hooks = [layer.register_forward_hook(record) for layer in layers]
         try:
-            losses = per_row_losses(learner(part[:, :-1]), part)
+            losses = losses_of(learner, part) if losses_of else per_row_losses(learner(part[:, :-1]), part)
             torch.autograd.grad(losses.sum(), list(learner.parameters()))
         finally:
             for hook in hooks:

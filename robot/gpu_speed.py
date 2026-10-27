@@ -14,7 +14,7 @@ import torch
 import warp as wp
 
 from gpu_world import CONSTRAINTS_PER_COPY, CONTACTS_PER_COPY, GpuWorld
-from world_steps import STEPS
+from constants import STEPS
 
 
 def random_starts(world, generator):

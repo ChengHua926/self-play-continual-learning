@@ -38,6 +38,10 @@ class GpuWorld:
         self.qpos, self.qvel, self.ctrl, self.time = view(self.d.qpos), view(self.d.qvel), view(self.d.ctrl), view(self.d.time)
         self.hand_position = view(self.d.site_xpos)[:, layout.hand_site]
         self.hand_orientation = view(self.d.site_xmat)[:, layout.hand_site]
+        # For the hand-written ways (gpu_ways.py). Read between control steps, these are one 2 ms physics
+        # step old (positions are worked out at the start of each physics step).
+        self.handle_position = view(self.d.site_xpos)[:, model.site("SquareNut_handle_site").id]
+        self.nut_orientation = view(self.d.xmat)[:, model.body("SquareNut_main").id]
         # The arm's joints and speeds come first in the scene, so plain slices keep these live views of
         # Warp's arrays (indexing with a list would make one-off copies instead).
         assert layout.arm_joints == layout.arm_v == layout.arm_q == list(range(7))

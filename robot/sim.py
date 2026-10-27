@@ -39,6 +39,10 @@ HOME_DAMPING = 2 * np.sqrt(HOME_STIFFNESS)
 LARGEST = np.array([0.05, 0.05, 0.05, 0.5, 0.5, 0.5])     # meters and radians per control step
 FINGER_SPEED = 0.01         # change of the finger targets per physics step
 HOME = np.array([0, np.pi / 16, 0, -np.pi / 2 - np.pi / 3, 0, np.pi - 0.2, np.pi / 4])    # robosuite's Panda home pose
+# The scene's usual start, as world.World.default_start has it: the fingers where robosuite's reset puts
+# them, and the nut in the middle of robosuite's placement area at its placing height, turned 0.
+DEFAULT_FINGERS = (0.020833, -0.020833)
+DEFAULT_NUT = (-0.1125, 0.1675, 0.89)
 
 
 class Sim:
@@ -63,6 +67,13 @@ class Sim:
         self.finger_middle, self.finger_half = (low + high) / 2, (high - low) / 2
         self.finger_targets = np.zeros(2)
         self.goal_position, self.goal_orientation = np.zeros(3), np.eye(3)
+        mujoco.mj_forward(self.model, self.data)
+        self.square_peg = self.data.xpos[self.model.body("peg1").id][:2].copy()     # where the nut goes, seen from above
+        # What robot_machine.decode reads, as world.World has it.
+        self.arm_range = self.model.jnt_range[self.arm_joints].copy()
+        self.finger_range = self.model.jnt_range[[joint(f"gripper0_finger_joint{i}").id for i in (1, 2)]].copy()
+        self.default_start = {"arm": HOME.copy(), "fingers": np.array(DEFAULT_FINGERS), "nut_position": np.array(DEFAULT_NUT),
+                              "nut_quaternion": np.array([1.0, 0.0, 0.0, 0.0])}
 
     def set_recorded(self, flat_state, finger_targets):
         """Set a state as robosuite records it (time, all positions, all velocities)."""

@@ -24,17 +24,14 @@ import mujoco
 import numpy as np
 import robosuite
 
+from constants import STATE_SIZE, STEPS, TABLE_TOP  # noqa: F401  (others import them from here)
+
 # As recorded in the human demos' file (test_robot.py checks this).
 CONTROLLER = {"type": "OSC_POSE", "input_max": 1, "input_min": -1,
               "output_max": [0.05, 0.05, 0.05, 0.5, 0.5, 0.5], "output_min": [-0.05, -0.05, -0.05, -0.5, -0.5, -0.5],
               "kp": 150, "damping": 1, "impedance_mode": "fixed", "kp_limits": [0, 300], "damping_limits": [0, 10],
               "position_limits": None, "orientation_limits": None, "uncouple_pos_ori": True,
               "control_delta": True, "interpolation": None, "ramp_ratio": 0.2}
-# Control steps in one experiment: 2.5 s. Any situation can be a start, so an experiment need not be
-# as long as a human demo (median 150 steps), and short ones give more different starts for the compute.
-STEPS = 50
-STATE_SIZE = 33
-TABLE_TOP = 0.82            # height of the table's surface, in meters
 
 
 class World:

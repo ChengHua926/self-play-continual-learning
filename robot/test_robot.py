@@ -10,7 +10,7 @@ from pathlib import Path
 import h5py
 import numpy as np
 
-import machine
+import robot_machine as machine
 from world import CONTROLLER, STEPS, World
 
 DEMOS = Path(__file__).resolve().parent.parent / "data" / "robomimic" / "square_ph" / "low_dim_v141.hdf5"

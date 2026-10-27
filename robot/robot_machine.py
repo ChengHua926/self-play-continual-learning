@@ -16,7 +16,7 @@ Everything starts at rest. The world then runs all 50 steps, and every state is 
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from world import STATE_SIZE, STEPS, TABLE_TOP
+from constants import STATE_SIZE, STEPS, TABLE_TOP
 
 START_BYTES = 15
 ACTION_SIZE = 7
