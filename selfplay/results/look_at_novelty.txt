@@ -1,0 +1,6 @@
+64 of novelty-0's final programs, each run 8 times: 98% write different bytes from run to run
+   novelty, as the reward measured it:                 median 6.98
+   the same for 512 other outputs from memory:         median 5.98
+   distance to the nearest other run of the program:   median 10.54
+   novelty if the other 7 runs were in memory too:     median 6.98
+   the learner's loss on these outputs:                median 0.006 nats per byte

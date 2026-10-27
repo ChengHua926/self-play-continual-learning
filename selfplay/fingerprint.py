@@ -4,6 +4,10 @@ For each generator checkpoint, sample PROGRAMS programs, run them on the machine
     symbols   mean program length (symbols between S and F)
     kl        mean of log g(x) - log g0(x) over the generator's own programs: how far it has moved
               from the prior, in nats (an estimate of KL(g || g0))
+    spread    the standard deviation of log g(x) - log g0(x) over the same programs. The pull
+              toward g0 (beta in train.py) moves the generator only through how this differs
+              between programs, so beta x spread is that pull's size next to the reward's (whose
+              spread is 1 after standardizing)
     wrote     share of programs that write at least one byte
     bytes     mean number of bytes written
     depth     share of programs at loop depth 0, 1, 2 and 3 or more
@@ -40,10 +44,11 @@ def fingerprint(checkpoint, where, seed=0):
     torch.manual_seed(seed)
     programs = sample(model, PROGRAMS, where)
     with torch.no_grad():
-        kl = (log_probs(model, programs, where).cpu() - prior_log_probs(programs)).mean().item()
+        log_ratio = log_probs(model, programs, where).cpu() - prior_log_probs(programs)
     max_steps, tape_length = machine.limits(shape["d_model"], shape["n_layers"])
     _, written, depths = machine.run(programs, np.arange(PROGRAMS), max_steps, tape_length)
-    return {"symbols": float(np.mean([len(body(p)) for p in programs])), "kl": kl,
+    return {"symbols": float(np.mean([len(body(p)) for p in programs])),
+            "kl": log_ratio.mean().item(), "spread": log_ratio.std().item(),
             "wrote": float((written > 0).mean()), "bytes": float(written.mean()),
             "depth": [float((np.minimum(depths, 3) == d).mean()) for d in range(4)]}
 
@@ -70,5 +75,5 @@ if __name__ == "__main__":
         sys.exit()
     for checkpoint in sys.argv[1:]:
         f = fingerprint(checkpoint, where)
-        print(f"{checkpoint}: {f['symbols']:.1f} symbols, KL {f['kl']:.1f} nats, {f['wrote']:.0%} write, "
+        print(f"{checkpoint}: {f['symbols']:.1f} symbols, KL {f['kl']:.1f} nats (spread {f['spread']:.1f}), {f['wrote']:.0%} write, "
               f"{f['bytes']:.0f} bytes, depth 0/1/2/3+ " + "/".join(f"{d:.0%}" for d in f["depth"]), flush=True)

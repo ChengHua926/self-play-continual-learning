@@ -1,11 +1,11 @@
-results/loss_delta-0/generator_2048.pth: 58.4 symbols, KL 101.8 nats, 96% write, 3244 bytes, depth 0/1/2/3+ 1%/10%/15%/73%
-results/loss_delta-1/generator_2048.pth: 38.3 symbols, KL 61.1 nats, 96% write, 3410 bytes, depth 0/1/2/3+ 2%/6%/6%/86%
-results/novelty-0/generator_2048.pth: 29.7 symbols, KL 37.1 nats, 99% write, 3936 bytes, depth 0/1/2/3+ 0%/2%/20%/78%
-results/novelty-1/generator_2048.pth: 30.5 symbols, KL 44.7 nats, 99% write, 3860 bytes, depth 0/1/2/3+ 1%/5%/17%/77%
-results/prediction_error-0/generator_2048.pth: 26.5 symbols, KL 31.7 nats, 98% write, 3655 bytes, depth 0/1/2/3+ 0%/21%/11%/68%
-results/prediction_error-1/generator_2048.pth: 31.1 symbols, KL 33.4 nats, 99% write, 3798 bytes, depth 0/1/2/3+ 0%/15%/5%/79%
-results/self-play-0/generator_2048.pth: 41.7 symbols, KL 60.7 nats, 95% write, 3361 bytes, depth 0/1/2/3+ 2%/4%/10%/84%
-results/self-play-1/generator_2048.pth: 44.0 symbols, KL 64.7 nats, 95% write, 2951 bytes, depth 0/1/2/3+ 4%/7%/12%/76%
-results/shuffle-0/generator_2048.pth: 18.6 symbols, KL 11.2 nats, 42% write, 102 bytes, depth 0/1/2/3+ 23%/24%/20%/34%
-results/shuffle-1/generator_2048.pth: 21.9 symbols, KL 10.8 nats, 34% write, 39 bytes, depth 0/1/2/3+ 22%/32%/22%/24%
-../data/selfplay/weights/100k/seed-40354564/generator_2048.pth: 30.9 symbols, KL 50.3 nats, 95% write, 3338 bytes, depth 0/1/2/3+ 1%/5%/58%/36%
+results/loss_delta-0/generator_2048.pth: 58.4 symbols, KL 101.8 nats (spread 63.3), 96% write, 3244 bytes, depth 0/1/2/3+ 1%/10%/15%/73%
+results/loss_delta-1/generator_2048.pth: 38.3 symbols, KL 61.1 nats (spread 26.2), 96% write, 3410 bytes, depth 0/1/2/3+ 2%/6%/6%/86%
+results/novelty-0/generator_2048.pth: 29.7 symbols, KL 37.1 nats (spread 10.2), 99% write, 3936 bytes, depth 0/1/2/3+ 0%/2%/20%/78%
+results/novelty-1/generator_2048.pth: 30.5 symbols, KL 44.7 nats (spread 11.8), 99% write, 3860 bytes, depth 0/1/2/3+ 1%/5%/17%/77%
+results/prediction_error-0/generator_2048.pth: 26.5 symbols, KL 31.7 nats (spread 10.7), 98% write, 3655 bytes, depth 0/1/2/3+ 0%/21%/11%/68%
+results/prediction_error-1/generator_2048.pth: 31.1 symbols, KL 33.4 nats (spread 9.8), 99% write, 3798 bytes, depth 0/1/2/3+ 0%/15%/5%/79%
+results/self-play-0/generator_2048.pth: 41.7 symbols, KL 60.7 nats (spread 46.0), 95% write, 3361 bytes, depth 0/1/2/3+ 2%/4%/10%/84%
+results/self-play-1/generator_2048.pth: 44.0 symbols, KL 64.7 nats (spread 42.3), 95% write, 2951 bytes, depth 0/1/2/3+ 4%/7%/12%/76%
+results/shuffle-0/generator_2048.pth: 18.6 symbols, KL 11.2 nats (spread 10.5), 42% write, 102 bytes, depth 0/1/2/3+ 23%/24%/20%/34%
+results/shuffle-1/generator_2048.pth: 21.9 symbols, KL 10.8 nats (spread 10.8), 34% write, 39 bytes, depth 0/1/2/3+ 22%/32%/22%/24%
+../data/selfplay/weights/100k/seed-40354564/generator_2048.pth: 30.9 symbols, KL 50.3 nats (spread 29.2), 95% write, 3338 bytes, depth 0/1/2/3+ 1%/5%/58%/36%
