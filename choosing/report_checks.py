@@ -1,6 +1,6 @@
 """Read the checks of the setup (run_checks.py), with rules fixed before the run.
 
-Run it with:   .venv/bin/python report_checks.py      (after run_checks.py)
+Run it with:   ../.venv/bin/python report_checks.py      (after run_checks.py)
 
 Knowledge (test_set.py) is the share of the game's movement the world model predicts, room by
 room, every room counting the same. Each run is read by its knowledge averaged over the whole

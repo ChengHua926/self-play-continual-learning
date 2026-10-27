@@ -1,8 +1,14 @@
 __pycache__/
 .DS_Store
 .venv/
-results/*_runs/
-results/game_comparison.log
+choosing/results/*_runs/
+choosing/results/game_comparison.log
+# results too big for git; their reports and figures are committed
+choosing/results/checks.npz
+choosing/results/game_comparison.npz
+choosing/results/montezuma_twin_set.npz
+choosing/results/positive_control.npz
+choosing/results/step_b.npz
 data/
 rereading/results/**/*.pt
 rereading/*.log

@@ -10,7 +10,7 @@ Five rules, 10 runs each, 8 million frames per run, in the same loop as every le
 report_checks.py reads them with rules fixed before the run. The world model is checked on its
 own, in check_world_model.py.
 
-Run it with:   .venv/bin/python run_checks.py      (about an hour)
+Run it with:   ../.venv/bin/python run_checks.py      (about an hour)
 Each run is saved when it ends (runs.py); after a crash, running it again continues. At the end
 it writes results/checks.npz and prints the report.
 """

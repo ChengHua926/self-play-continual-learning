@@ -1,6 +1,6 @@
 """Small checks that the learners of the game do what they say (learners.py).
 
-Run them with:   .venv/bin/python -m unittest test_learners -v
+Run them with:   ../.venv/bin/python -m unittest test_learners -v
 """
 
 import unittest

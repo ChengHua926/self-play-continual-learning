@@ -28,7 +28,7 @@ How well a world model knows the game (TestSet.knowledge), every room counting t
        guesses wildly, and that is knowing nothing, not knowing less than nothing.
     3. its knowledge of the game: the average over the rooms.
 
-Run it with:   .venv/bin/python test_set.py     (about 25 minutes; writes results/montezuma_test_set.npz)
+Run it with:   ../.venv/bin/python test_set.py     (about 25 minutes; writes results/montezuma_test_set.npz)
 """
 
 from multiprocessing import Pool

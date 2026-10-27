@@ -1,6 +1,6 @@
 """Small checks that the game harness does what it says.
 
-Run them with:   .venv/bin/python -m unittest test_game -v
+Run them with:   ../.venv/bin/python -m unittest test_game -v
 """
 
 import unittest

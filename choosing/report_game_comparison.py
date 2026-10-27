@@ -1,6 +1,6 @@
 """Read the game comparison (run_game_comparison.py).
 
-Run it with:   .venv/bin/python report_game_comparison.py     (after run_game_comparison.py)
+Run it with:   ../.venv/bin/python report_game_comparison.py     (after run_game_comparison.py)
 
 Knowledge (test_set.py) is the share of the game's movement the world model predicts, room by
 room, every room counting the same: 0 is no better than guessing "nothing moves", 1 is perfect.

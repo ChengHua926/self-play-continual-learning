@@ -1,6 +1,6 @@
 """Read the positive control (run_positive_control.py): does the measuring stick reward exploring?
 
-Run it with:   .venv/bin/python report_positive_control.py     (after run_positive_control.py)
+Run it with:   ../.venv/bin/python report_positive_control.py     (after run_positive_control.py)
 
 Knowledge (test_set.py) is the share of the game's movement the world model predicts, room by
 room, every room counting the same: 0 is no better than guessing "nothing moves", 1 is perfect.

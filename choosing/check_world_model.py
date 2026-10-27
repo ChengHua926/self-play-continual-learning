@@ -24,7 +24,7 @@ every test room other than the first with at least 20 places in the test set and
 (so that about 20 are left to train on). If fewer than 5 rooms can be judged, the check cannot
 be judged.
 
-Run it with:   .venv/bin/python check_world_model.py      (about 30 minutes)
+Run it with:   ../.venv/bin/python check_world_model.py      (about 30 minutes)
 It writes results/montezuma_twin_set.npz and results/world_model_check.txt.
 """
 

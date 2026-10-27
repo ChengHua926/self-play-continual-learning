@@ -23,7 +23,7 @@ learns the visits it saw better than the rooms, and the far test rooms rest on f
 The runs of uniform choice, random play and cell counts are the setup checks' own: the same code
 and seeds give the same runs, so they are copied from results/checks_runs, not run again.
 
-Run it with:   .venv/bin/python run_game_comparison.py      (about 4 hours)
+Run it with:   ../.venv/bin/python run_game_comparison.py      (about 4 hours)
 Each run is saved when it ends (runs.py); after a crash, running it again continues. At the end
 it writes results/game_comparison.npz and prints the report (report_game_comparison.py).
 """

@@ -16,7 +16,7 @@ The rule, fixed before the run. The control passes if cell counts:
 The report adds checks that do not depend on the rule (report_positive_control.py), above all
 whether knowledge goes with the rooms a run reached.
 
-Run it with:   .venv/bin/python run_positive_control.py      (about an hour)
+Run it with:   ../.venv/bin/python run_positive_control.py      (about an hour)
 It writes results/positive_control.npz and prints the report (report_positive_control.py).
 """
 
