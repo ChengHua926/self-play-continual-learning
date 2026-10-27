@@ -1,8 +1,9 @@
 """The robot runs against each other: the comparison rule, fixed before any scores were seen.
 
 A run's score is its learner's test 1 loss (scores.py: nats per number on the human demos' steps,
-lower is better), the mean of its last three checkpoints (rounds 1536, 1792 and 2048), because one
-checkpoint can be noisy. Two scores per run: over all steps, and over the steps where the human holds
+lower is better), the mean of its last three checkpoints (rounds 512, 768 and 1024), because one
+checkpoint can be noisy. The runs stop at round 1024, half the paper's budget, to save cost: Cheng
+decided this at round 144, before any test 1 score had been seen. Two scores per run: over all steps, and over the steps where the human holds
 the nut, where the coverage check found the baselines' data scarcest.
 
     the main question   is self-play's world model better than people's way's (the deciding
@@ -27,7 +28,7 @@ from pathlib import Path
 import numpy as np
 
 ARMS = ("self-play", "shuffle", "uniform_programs", "plain_random", "peoples_way", "peoples_way_at_nut")
-LAST = ("1536", "1792", "2048")
+LAST = ("512", "768", "1024")
 PARTS = ("all", "holding")
 
 
