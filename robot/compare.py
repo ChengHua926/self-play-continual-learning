@@ -3,8 +3,9 @@
 A run's score is its learner's test 1 loss (scores.py: nats per number on the human demos' steps,
 lower is better), the mean of its last three checkpoints (rounds 512, 768 and 1024), because one
 checkpoint can be noisy. The runs stop at round 1024, half the paper's budget, to save cost: Cheng
-decided this at round 144, before any test 1 score had been seen. Two scores per run: over all steps, and over the steps where the human holds
-the nut, where the coverage check found the baselines' data scarcest.
+decided this at round 144, before any test 1 score had been seen. Two scores per run: over all
+steps, and over the steps where the human holds the nut, where the coverage check found the
+baselines' data scarcest.
 
     the main question   is self-play's world model better than people's way's (the deciding
                         baseline: what people write by hand today)? Better only if both self-play
