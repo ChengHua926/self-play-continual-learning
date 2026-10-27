@@ -1,0 +1,32 @@
+Scores, bits per byte (lower is better), each the mean of the last three checkpoints
+   dclm_ranked  self-play 5.77/6.21   uniform 6.18/6.13   shuffle 5.91/6.09   loss_delta 6.11/7.02   novelty 5.93/6.36   prediction_error 7.53/6.82
+   dna          self-play 2.97/3.10   uniform 3.46/3.70   shuffle 4.26/3.83   loss_delta 3.22/3.54   novelty 4.25/4.51   prediction_error 5.48/3.89
+   audio_8bit   self-play 3.39/3.25   uniform 5.03/4.49   shuffle 4.50/4.48   loss_delta 3.75/4.14   novelty 4.92/4.92   prediction_error 5.44/4.62
+   audio_16bit  self-play 6.32/6.82   uniform 6.74/6.72   shuffle 6.45/6.66   loss_delta 6.58/7.50   novelty 6.41/6.42   prediction_error 7.76/7.19
+Gate: our uniform seeds at round 2048 against the released uniform seeds
+   uniform-0 dclm_ranked  5.99   theirs 6.15-6.87   OUTSIDE
+   uniform-0 dna          3.38   theirs 3.44-3.72   OUTSIDE
+   uniform-0 audio_8bit   4.49   theirs 4.42-4.90   inside
+   uniform-0 audio_16bit  6.64   theirs 6.83-7.04   OUTSIDE
+   uniform-1 dclm_ranked  5.89   theirs 6.15-6.87   OUTSIDE
+   uniform-1 dna          3.63   theirs 3.44-3.72   inside
+   uniform-1 audio_8bit   4.47   theirs 4.42-4.90   inside
+   uniform-1 audio_16bit  6.71   theirs 6.83-7.04   OUTSIDE
+   gate FAILED
+Reproduction: mean of our self-play seeds against mean of our uniform seeds
+   audio_8bit   self-play 3.32, uniform 4.76: self-play better
+   dna          self-play 3.03, uniform 3.58: self-play better
+Ablations: worse only if both seeds are above both self-play seeds
+   shuffle    audio_8bit   4.50/4.48 against self-play at most 3.39: worse
+   shuffle    dna          4.26/3.83 against self-play at most 3.10: worse
+   loss_delta audio_8bit   3.75/4.14 against self-play at most 3.39: worse
+   loss_delta dna          3.22/3.54 against self-play at most 3.10: worse
+Our rewards: better or worse only if both seeds are beyond both seeds of the arm compared with
+   novelty          audio_8bit   4.92/4.92 against self-play 3.39/3.25: worse
+   novelty          audio_8bit   4.92/4.92 against uniform 5.03/4.49: not shown different
+   novelty          dna          4.25/4.51 against self-play 2.97/3.10: worse
+   novelty          dna          4.25/4.51 against uniform 3.46/3.70: worse
+   prediction_error audio_8bit   5.44/4.62 against self-play 3.39/3.25: worse
+   prediction_error audio_8bit   5.44/4.62 against uniform 5.03/4.49: not shown different
+   prediction_error dna          5.48/3.89 against self-play 2.97/3.10: worse
+   prediction_error dna          5.48/3.89 against uniform 3.46/3.70: worse
