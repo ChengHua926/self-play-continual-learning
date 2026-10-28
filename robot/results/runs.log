@@ -1,0 +1,391 @@
+Warp 1.18.0 initialized:
+   CUDA Toolkit 13.4, Driver 13.0
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA H100 PCIe" (79 GiB, sm_90, mempool enabled)
+   Kernel cache:
+     /home/ubuntu/.cache/warp/1.18.0
+Module mujoco_warp._src.smooth 11fd811 load on device 'cuda:0' took 1.09 ms  (cached)
+Module _subtree_com_acc__locals__kernel_edcab3a5 edcab3a load on device 'cuda:0' took 0.49 ms  (cached)
+Module _crb_accumulate__locals__kernel_c473801d c473801 load on device 'cuda:0' took 0.44 ms  (cached)
+Module _small_cholesky_factorize_block__locals__kernel_79a57364 20d25ea load on device 'cuda:0' took 0.46 ms  (cached)
+Module _tile_cholesky_factorize_block__locals__kernel_f101fbbf 16ecce9 load on device 'cuda:0' took 32.13 ms  (cached)
+Module _nxn_broadphase__locals__kernel_f67d158d f67d158 load on device 'cuda:0' took 0.51 ms  (cached)
+Module _nxn_broadphase__locals__kernel_f67d158d 0ef9096 load on device 'cuda:0' took 0.45 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_bcdac240 bcdac24 load on device 'cuda:0' took 1.14 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_c1a8314f c1a8314 load on device 'cuda:0' took 1.13 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_abe1d30f abe1d30 load on device 'cuda:0' took 1.15 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_204d003d 204d003 load on device 'cuda:0' took 1.25 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_a6f32ed6 a6f32ed load on device 'cuda:0' took 1.20 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_c34753f0 c34753f load on device 'cuda:0' took 0.76 ms  (cached)
+Module mujoco_warp._src.constraint 8d4d513 load on device 'cuda:0' took 0.52 ms  (cached)
+Module _friction_dof__locals__kernel_17c6dde8 17c6dde load on device 'cuda:0' took 0.63 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_04ef6385 04ef638 load on device 'cuda:0' took 0.53 ms  (cached)
+Module _efc_contact_init__locals__kernel_7ebd0b1c 7ebd0b1 load on device 'cuda:0' took 0.53 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_c6f56b01 f2f4213 load on device 'cuda:0' took 0.59 ms  (cached)
+Module _efc_contact_update__locals__kernel_fd314d91 fd314d9 load on device 'cuda:0' took 0.49 ms  (cached)
+Module _transmission__locals__kernel_1bdbf482 1bdbf48 load on device 'cuda:0' took 0.55 ms  (cached)
+Module mujoco_warp._src.forward 827bf97 load on device 'cuda:0' took 0.86 ms  (cached)
+Module mujoco_warp._src.passive 051fd2b load on device 'cuda:0' took 0.63 ms  (cached)
+Module _gravity_force__locals__kernel_0a335ab0 0a335ab load on device 'cuda:0' took 0.50 ms  (cached)
+Module mujoco_warp._src.support 970ef9a load on device 'cuda:0' took 0.50 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_0d58b952 0d58b95 load on device 'cuda:0' took 0.51 ms  (cached)
+Module _cfrc_backward__locals__kernel_2b55454e 2b55454 load on device 'cuda:0' took 0.52 ms  (cached)
+Module _qfrc_actuator__locals__kernel_5704235d 5704235 load on device 'cuda:0' took 0.62 ms  (cached)
+Module _qfrc_smooth__locals__kernel_8b823980 8b82398 load on device 'cuda:0' took 0.53 ms  (cached)
+Module _small_cholesky_solve_block__locals__kernel_c4e2dcc2 4c4cbb4 load on device 'cuda:0' took 0.54 ms  (cached)
+Module _tile_cholesky_solve_block__locals__kernel_818a5faf 2f1cc99 load on device 'cuda:0' took 33.51 ms  (cached)
+Module _solve_init_dof__locals__kernel_60896b56 60896b5 load on device 'cuda:0' took 0.49 ms  (cached)
+Module mujoco_warp._src.solver 38fd86c load on device 'cuda:0' took 0.63 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_3929da25 3929da2 load on device 'cuda:0' took 0.52 ms  (cached)
+Module mul_m_kernel__locals___mul_m_f3de1cc7 f3de1cc load on device 'cuda:0' took 0.53 ms  (cached)
+Module _update_constraint_efc__locals__kernel_867d7711 867d771 load on device 'cuda:0' took 0.51 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_bd7ca2ec bd7ca2e load on device 'cuda:0' took 0.47 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_b20934d7 b20934d load on device 'cuda:0' took 0.51 ms  (cached)
+Module _update_gradient_grad__locals__kernel_b7028268 b702826 load on device 'cuda:0' took 0.51 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_3f5f234d 973d156 load on device 'cuda:0' took 1.12 ms  (cached)
+Module _update_gradient_JTCJ_dense__locals__kernel_9fe97875 9fe9787 load on device 'cuda:0' took 0.50 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_3281c62b a5ea975 load on device 'cuda:0' took 50.42 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_12148111 a647fba load on device 'cuda:0' took 0.71 ms  (cached)
+Module _solve_done__locals__kernel_5c8f0d18 5c8f0d1 load on device 'cuda:0' took 19.65 ms  (cached)
+Module _cfrc_ext_contact__locals__kernel_acfe6771 acfe677 load on device 'cuda:0' took 0.61 ms  (cached)
+Module mujoco_warp._src.sensor 58d1d42 load on device 'cuda:0' took 0.96 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_9da335f1 a5c2521 load on device 'cuda:0' took 0.56 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_5c841c33 59ea685 load on device 'cuda:0' took 51.17 ms  (cached)
+Module _next_time_builder__locals___next_time_bc454e15 bc454e1 load on device 'cuda:0' took 0.54 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_cacc570d cacc570 load on device 'cuda:0' took 0.51 ms  (cached)
+Module reset_data__locals__reset_M_b96df643 b96df64 load on device 'cuda:0' took 0.42 ms  (cached)
+Module reset_data__locals__reset_mocap_f80f6b04 f80f6b0 load on device 'cuda:0' took 0.38 ms  (cached)
+Module reset_data__locals__reset_contact_cc1758aa cc1758a load on device 'cuda:0' took 0.38 ms  (cached)
+Module reset_data__locals__reset_sleep_5f27666f 5f27666 load on device 'cuda:0' took 0.51 ms  (cached)
+Module reset_data__locals__reset_nworld_a85ff81c a85ff81 load on device 'cuda:0' took 0.37 ms  (cached)
+round 0: 37.4 s (34.2 simulating); training loss self-play 2.089, shuffle 2.180, uniform_programs 2.192, plain_random 2.809, peoples_way 1.720, peoples_way_at_nut 1.919
+round 0 test 1 (nats per number; all / holding / not holding):
+   self-play-0: 1.645 / 1.595 / 1.693
+   self-play-1: 1.476 / 1.604 / 1.353
+   shuffle-0: 1.645 / 1.595 / 1.694
+   shuffle-1: 1.475 / 1.603 / 1.352
+   uniform_programs-0: 1.644 / 1.594 / 1.691
+   uniform_programs-1: 1.477 / 1.604 / 1.354
+   plain_random-0: 1.640 / 1.588 / 1.690
+   plain_random-1: 1.472 / 1.600 / 1.349
+   peoples_way-0: 1.609 / 1.584 / 1.632
+   peoples_way-1: 1.462 / 1.592 / 1.336
+   peoples_way_at_nut-0: 1.610 / 1.584 / 1.634
+   peoples_way_at_nut-1: 1.466 / 1.597 / 1.340
+round 16: 33.8 s (30.9 simulating); training loss self-play 1.016, shuffle 0.223, uniform_programs 0.235, plain_random 1.433, peoples_way 0.595, peoples_way_at_nut 0.790
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 32: 35.2 s (32.1 simulating); training loss self-play 0.379, shuffle -0.464, uniform_programs -0.569, plain_random 0.817, peoples_way 0.416, peoples_way_at_nut 0.257
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 48: 36.4 s (33.0 simulating); training loss self-play 0.260, shuffle -0.716, uniform_programs -0.495, plain_random 0.688, peoples_way -0.058, peoples_way_at_nut 0.051
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 64: 35.7 s (32.7 simulating); training loss self-play 0.060, shuffle -0.712, uniform_programs -0.960, plain_random 0.527, peoples_way -0.308, peoples_way_at_nut -0.209
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 80: 35.9 s (32.8 simulating); training loss self-play -0.092, shuffle -1.079, uniform_programs -1.057, plain_random 0.424, peoples_way -0.482, peoples_way_at_nut -0.294
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 96: 35.6 s (32.7 simulating); training loss self-play -0.201, shuffle -0.988, uniform_programs -1.271, plain_random 0.412, peoples_way -0.561, peoples_way_at_nut -0.425
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 112: 34.8 s (32.2 simulating); training loss self-play -0.289, shuffle -1.234, uniform_programs -1.316, plain_random 0.365, peoples_way -0.758, peoples_way_at_nut -0.487
+round 128: 36.2 s (33.3 simulating); training loss self-play -0.421, shuffle -1.178, uniform_programs -0.919, plain_random 0.324, peoples_way -0.836, peoples_way_at_nut -0.540
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 144: 35.8 s (32.9 simulating); training loss self-play -0.445, shuffle -0.918, uniform_programs -1.166, plain_random 0.272, peoples_way -0.943, peoples_way_at_nut -0.569
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 160: 36.4 s (33.3 simulating); training loss self-play -0.400, shuffle -0.821, uniform_programs -1.163, plain_random 0.269, peoples_way -0.876, peoples_way_at_nut -0.612
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 176: 36.1 s (33.1 simulating); training loss self-play -0.475, shuffle -1.163, uniform_programs -1.358, plain_random 0.207, peoples_way -0.924, peoples_way_at_nut -0.571
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 192: 36.5 s (33.5 simulating); training loss self-play -0.566, shuffle -1.321, uniform_programs -1.345, plain_random 0.225, peoples_way -1.097, peoples_way_at_nut -0.613
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 208: 36.2 s (33.2 simulating); training loss self-play -0.546, shuffle -1.245, uniform_programs -1.406, plain_random 0.174, peoples_way -1.161, peoples_way_at_nut -0.752
+round 224: 36.7 s (33.6 simulating); training loss self-play -0.580, shuffle -1.087, uniform_programs -1.408, plain_random 0.219, peoples_way -1.141, peoples_way_at_nut -0.755
+round 240: 36.5 s (33.5 simulating); training loss self-play -0.598, shuffle -1.424, uniform_programs -1.462, plain_random 0.345, peoples_way -1.186, peoples_way_at_nut -0.814
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 256: 36.0 s (33.0 simulating); training loss self-play -0.681, shuffle -1.628, uniform_programs -1.434, plain_random 0.297, peoples_way -1.143, peoples_way_at_nut -0.819
+round 256 test 1 (nats per number; all / holding / not holding):
+   self-play-0: 0.738 / 1.057 / 0.432
+   self-play-1: 0.961 / 1.021 / 0.904
+   shuffle-0: 11.136 / 8.506 / 13.668
+   shuffle-1: 2.573 / 2.846 / 2.309
+   uniform_programs-0: 15.943 / 20.944 / 11.127
+   uniform_programs-1: 17.228 / 29.453 / 5.453
+   plain_random-0: 1.057 / 1.398 / 0.729
+   plain_random-1: 0.977 / 1.322 / 0.645
+   peoples_way-0: 0.334 / 0.857 / -0.170
+   peoples_way-1: 0.766 / 1.274 / 0.277
+   peoples_way_at_nut-0: 0.253 / 0.599 / -0.079
+   peoples_way_at_nut-1: -0.054 / 0.510 / -0.598
+round 272: 36.5 s (33.7 simulating); training loss self-play -0.442, shuffle -1.656, uniform_programs -1.566, plain_random 0.170, peoples_way -1.119, peoples_way_at_nut -0.656
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 288: 36.2 s (33.1 simulating); training loss self-play -0.620, shuffle -1.751, uniform_programs -1.404, plain_random 0.096, peoples_way -1.129, peoples_way_at_nut -0.793
+round 304: 36.5 s (33.1 simulating); training loss self-play -0.755, shuffle -1.662, uniform_programs -1.679, plain_random 0.158, peoples_way -1.248, peoples_way_at_nut -0.767
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 320: 35.4 s (32.6 simulating); training loss self-play -0.762, shuffle -1.634, uniform_programs -1.602, plain_random 0.103, peoples_way -1.451, peoples_way_at_nut -0.870
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 336: 35.9 s (32.9 simulating); training loss self-play -0.758, shuffle -1.547, uniform_programs -1.575, plain_random 0.104, peoples_way -1.364, peoples_way_at_nut -0.874
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 352: 36.1 s (33.1 simulating); training loss self-play -0.738, shuffle -1.684, uniform_programs -1.620, plain_random 0.116, peoples_way -1.444, peoples_way_at_nut -0.881
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 368: 36.3 s (33.3 simulating); training loss self-play -0.763, shuffle -0.928, uniform_programs -1.683, plain_random 0.085, peoples_way -1.461, peoples_way_at_nut -0.860
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 384: 36.2 s (33.2 simulating); training loss self-play -0.790, shuffle -1.457, uniform_programs -1.768, plain_random 0.225, peoples_way -1.236, peoples_way_at_nut -0.973
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 400: 36.0 s (32.9 simulating); training loss self-play -0.589, shuffle -1.707, uniform_programs -1.883, plain_random 0.107, peoples_way -1.407, peoples_way_at_nut -0.926
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 416: 36.2 s (33.1 simulating); training loss self-play -0.823, shuffle -1.684, uniform_programs -1.998, plain_random 0.129, peoples_way -1.300, peoples_way_at_nut -1.090
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 432: 36.5 s (33.5 simulating); training loss self-play -0.716, shuffle -1.899, uniform_programs -1.801, plain_random 0.087, peoples_way -1.466, peoples_way_at_nut -1.131
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 448: 36.5 s (33.5 simulating); training loss self-play -0.808, shuffle -1.674, uniform_programs -1.725, plain_random 0.039, peoples_way -1.476, peoples_way_at_nut -0.961
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 464: 35.9 s (32.9 simulating); training loss self-play -0.861, shuffle -2.025, uniform_programs -1.511, plain_random 0.069, peoples_way -1.361, peoples_way_at_nut -1.124
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 480: 36.1 s (32.9 simulating); training loss self-play -0.640, shuffle -1.768, uniform_programs -1.693, plain_random 0.032, peoples_way -1.577, peoples_way_at_nut -1.133
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 496: 35.8 s (32.8 simulating); training loss self-play -0.631, shuffle -1.830, uniform_programs -1.810, plain_random 0.050, peoples_way -1.364, peoples_way_at_nut -0.999
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 512: 36.3 s (33.0 simulating); training loss self-play -0.790, shuffle -1.916, uniform_programs -1.771, plain_random 0.038, peoples_way -1.206, peoples_way_at_nut -0.988
+round 512 test 1 (nats per number; all / holding / not holding):
+   self-play-0: 0.899 / 1.293 / 0.518
+   self-play-1: 0.824 / 1.055 / 0.601
+   shuffle-0: 4.892 / 4.008 / 5.742
+   shuffle-1: 2.967 / 4.077 / 1.899
+   uniform_programs-0: 12.728 / 15.808 / 9.763
+   uniform_programs-1: 7.154 / 11.041 / 3.411
+   plain_random-0: 1.064 / 1.146 / 0.985
+   plain_random-1: 0.983 / 1.291 / 0.687
+   peoples_way-0: 0.218 / 0.792 / -0.334
+   peoples_way-1: 0.418 / 1.159 / -0.295
+   peoples_way_at_nut-0: 0.043 / 0.356 / -0.258
+   peoples_way_at_nut-1: 0.123 / 0.393 / -0.137
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 528: 35.9 s (32.9 simulating); training loss self-play -0.846, shuffle -1.944, uniform_programs -1.934, plain_random 0.070, peoples_way -1.474, peoples_way_at_nut -1.069
+round 544: 35.8 s (32.7 simulating); training loss self-play -0.938, shuffle -1.947, uniform_programs -1.532, plain_random 0.121, peoples_way -1.661, peoples_way_at_nut -1.164
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 560: 36.1 s (33.0 simulating); training loss self-play -0.962, shuffle -1.902, uniform_programs -1.839, plain_random 0.049, peoples_way -1.260, peoples_way_at_nut -1.221
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 576: 36.3 s (33.2 simulating); training loss self-play -0.838, shuffle -2.101, uniform_programs -1.817, plain_random 0.038, peoples_way -1.572, peoples_way_at_nut -1.146
+round 592: 36.6 s (33.7 simulating); training loss self-play -0.959, shuffle -2.246, uniform_programs -2.159, plain_random -0.011, peoples_way -1.488, peoples_way_at_nut -1.199
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 608: 36.3 s (33.2 simulating); training loss self-play -0.972, shuffle -2.163, uniform_programs -2.001, plain_random 0.076, peoples_way -1.476, peoples_way_at_nut -1.036
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 624: 36.0 s (32.9 simulating); training loss self-play -0.876, shuffle -1.837, uniform_programs -1.887, plain_random 0.145, peoples_way -1.645, peoples_way_at_nut -1.155
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 640: 36.9 s (33.5 simulating); training loss self-play -0.884, shuffle -2.121, uniform_programs -2.072, plain_random 0.093, peoples_way -1.517, peoples_way_at_nut -0.993
+round 656: 36.8 s (33.7 simulating); training loss self-play -0.873, shuffle -1.779, uniform_programs -1.844, plain_random 0.123, peoples_way -1.706, peoples_way_at_nut -1.189
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 672: 36.2 s (33.3 simulating); training loss self-play -1.056, shuffle -2.062, uniform_programs -1.991, plain_random 0.058, peoples_way -1.667, peoples_way_at_nut -1.262
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 688: 37.1 s (33.5 simulating); training loss self-play -0.858, shuffle -1.797, uniform_programs -2.035, plain_random 0.004, peoples_way -1.508, peoples_way_at_nut -1.315
+round 704: 36.7 s (33.7 simulating); training loss self-play -1.055, shuffle -1.943, uniform_programs -2.072, plain_random -0.075, peoples_way -1.495, peoples_way_at_nut -1.225
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+linesearch iterations limit reached - please increase ls_iterations beyond 50
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.LS_ITERATIONS (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 720: 36.5 s (33.6 simulating); training loss self-play -1.120, shuffle -2.080, uniform_programs -2.190, plain_random 0.021, peoples_way -1.732, peoples_way_at_nut -1.307
+round 736: 36.1 s (33.1 simulating); training loss self-play -1.089, shuffle -2.296, uniform_programs -2.156, plain_random -0.041, peoples_way -1.778, peoples_way_at_nut -1.338
+round 752: 35.5 s (32.7 simulating); training loss self-play -0.971, shuffle -2.180, uniform_programs -1.788, plain_random 0.014, peoples_way -1.716, peoples_way_at_nut -1.296
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 768: 36.0 s (32.9 simulating); training loss self-play -1.147, shuffle -2.331, uniform_programs -1.909, plain_random -0.042, peoples_way -1.817, peoples_way_at_nut -1.354
+round 768 test 1 (nats per number; all / holding / not holding):
+   self-play-0: 1.069 / 1.352 / 0.797
+   self-play-1: 1.099 / 1.241 / 0.962
+   shuffle-0: 3.483 / 2.134 / 4.782
+   shuffle-1: 11.354 / 20.743 / 2.311
+   uniform_programs-0: 4.694 / 4.073 / 5.292
+   uniform_programs-1: 2.472 / 2.869 / 2.090
+   plain_random-0: 0.821 / 1.189 / 0.467
+   plain_random-1: 0.793 / 1.147 / 0.452
+   peoples_way-0: 0.468 / 0.982 / -0.027
+   peoples_way-1: 1.050 / 1.108 / 0.995
+   peoples_way_at_nut-0: 0.609 / 0.513 / 0.700
+   peoples_way_at_nut-1: 0.317 / 0.418 / 0.220
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 784: 35.6 s (32.5 simulating); training loss self-play -1.214, shuffle -2.011, uniform_programs -2.039, plain_random -0.071, peoples_way -1.693, peoples_way_at_nut -1.399
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 800: 36.5 s (33.4 simulating); training loss self-play -1.085, shuffle -2.044, uniform_programs -2.173, plain_random -0.027, peoples_way -1.723, peoples_way_at_nut -1.347
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 816: 36.0 s (33.0 simulating); training loss self-play -1.048, shuffle -2.131, uniform_programs -2.335, plain_random 0.069, peoples_way -1.536, peoples_way_at_nut -1.205
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 832: 36.3 s (33.4 simulating); training loss self-play -1.183, shuffle -2.189, uniform_programs -2.234, plain_random 0.152, peoples_way -1.598, peoples_way_at_nut -1.398
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 848: 35.8 s (32.9 simulating); training loss self-play -1.307, shuffle -2.372, uniform_programs -2.202, plain_random 0.024, peoples_way -1.772, peoples_way_at_nut -1.313
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 864: 36.2 s (33.1 simulating); training loss self-play -1.112, shuffle -2.277, uniform_programs -2.275, plain_random -0.009, peoples_way -1.732, peoples_way_at_nut -1.382
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 880: 36.7 s (33.6 simulating); training loss self-play -1.172, shuffle -2.247, uniform_programs -2.047, plain_random -0.020, peoples_way -1.803, peoples_way_at_nut -1.278
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 896: 36.2 s (33.1 simulating); training loss self-play -1.121, shuffle -2.540, uniform_programs -2.370, plain_random -0.003, peoples_way -1.832, peoples_way_at_nut -1.270
+round 912: 35.7 s (32.6 simulating); training loss self-play -1.237, shuffle -2.180, uniform_programs -2.248, plain_random -0.044, peoples_way -1.915, peoples_way_at_nut -0.964
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 928: 36.2 s (33.3 simulating); training loss self-play -1.059, shuffle -2.293, uniform_programs -2.221, plain_random -0.080, peoples_way -1.848, peoples_way_at_nut -1.170
+round 944: 36.1 s (33.1 simulating); training loss self-play -1.183, shuffle -2.335, uniform_programs -2.201, plain_random -0.035, peoples_way -1.890, peoples_way_at_nut -1.158
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 960: 36.0 s (32.9 simulating); training loss self-play -1.007, shuffle -2.446, uniform_programs -2.361, plain_random -0.080, peoples_way -1.851, peoples_way_at_nut -0.988
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 976: 36.0 s (33.0 simulating); training loss self-play -1.189, shuffle -1.991, uniform_programs -1.997, plain_random -0.036, peoples_way -1.349, peoples_way_at_nut -1.184
+round 992: 36.7 s (33.6 simulating); training loss self-play -1.115, shuffle -2.505, uniform_programs -2.312, plain_random -0.142, peoples_way -1.091, peoples_way_at_nut -1.243
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 1008: 36.2 s (33.1 simulating); training loss self-play -1.264, shuffle -2.475, uniform_programs -1.938, plain_random -0.190, peoples_way -1.375, peoples_way_at_nut -1.403
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+Warning: EPA horizon = 24 isn't large enough.
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)
+round 1024: 36.0 s (32.9 simulating); training loss self-play -1.104, shuffle -2.423, uniform_programs -2.263, plain_random 0.027, peoples_way -1.562, peoples_way_at_nut -1.417
+round 1024 test 1 (nats per number; all / holding / not holding):
+   self-play-0: 1.023 / 1.263 / 0.792
+   self-play-1: 0.969 / 1.140 / 0.804
+   shuffle-0: 1.623 / 1.743 / 1.508
+   shuffle-1: 9.840 / 17.833 / 2.141
+   uniform_programs-0: 3.572 / 2.468 / 4.636
+   uniform_programs-1: 1.964 / 2.567 / 1.384
+   plain_random-0: 0.786 / 1.122 / 0.462
+   plain_random-1: 0.844 / 1.194 / 0.507
+   peoples_way-0: 0.668 / 1.335 / 0.026
+   peoples_way-1: 0.380 / 0.772 / 0.003
+   peoples_way_at_nut-0: 0.715 / 0.220 / 1.191
+   peoples_way_at_nut-1: 0.039 / 0.419 / -0.328

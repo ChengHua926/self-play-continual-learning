@@ -1,0 +1,22 @@
+Test 1, nats per number (lower is better), mean of the last three checkpoints, seed 0 / seed 1
+   all: self-play 0.997/0.964   shuffle 3.333/8.054   uniform_programs 6.998/3.864   plain_random 0.890/0.873   peoples_way 0.452/0.616   peoples_way_at_nut 0.456/0.160
+   holding: self-play 1.303/1.145   shuffle 2.629/14.217   uniform_programs 7.450/5.492   plain_random 1.153/1.211   peoples_way 1.037/1.013   peoples_way_at_nut 0.363/0.410
+Self-play against each other arm: better or worse only if both seeds are beyond both of the other's
+   against shuffle              all: better   holding: better
+   against uniform_programs     all: better   holding: better
+   against plain_random         all: worse   holding: not shown different
+   against peoples_way          all: worse   holding: worse
+   against peoples_way_at_nut   all: worse   holding: worse
+Known answer: every run's test 1 loss at its last checkpoint below its loss at round 0
+   self-play-0            round 0 1.645 -> round 1024 1.023: learned
+   self-play-1            round 0 1.476 -> round 1024 0.969: learned
+   shuffle-0              round 0 1.645 -> round 1024 1.623: learned
+   shuffle-1              round 0 1.475 -> round 1024 9.840: DID NOT LEARN
+   uniform_programs-0     round 0 1.644 -> round 1024 3.572: DID NOT LEARN
+   uniform_programs-1     round 0 1.477 -> round 1024 1.964: DID NOT LEARN
+   plain_random-0         round 0 1.640 -> round 1024 0.786: learned
+   plain_random-1         round 0 1.472 -> round 1024 0.844: learned
+   peoples_way-0          round 0 1.609 -> round 1024 0.668: learned
+   peoples_way-1          round 0 1.462 -> round 1024 0.380: learned
+   peoples_way_at_nut-0   round 0 1.610 -> round 1024 0.715: learned
+   peoples_way_at_nut-1   round 0 1.466 -> round 1024 0.039: learned
