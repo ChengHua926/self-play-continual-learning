@@ -1,0 +1,5 @@
+Planning with untrained.pt as the model, success or fail only (20 demo starts per k):
+   k =  5 steps before the human's success: 90% succeeded (18 of 20)
+   k = 10 steps before the human's success: 65% succeeded (13 of 20)
+   k = 15 steps before the human's success: 50% succeeded (10 of 20)
+   k = 30 steps before the human's success: 10% succeeded (2 of 20)

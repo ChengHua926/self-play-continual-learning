@@ -5,11 +5,12 @@ The task is Square's, scored success or fail as robosuite scores it: the nut aro
 gripper away from it (at least 4.2 cm from the nut's center). Nothing else is rewarded.
 
 The starts are the human demos' own states, k steps before they succeeded (k = 5, 10, 15, 30): the
-nearer the goal, the easier. A planner, the cross-entropy method, tries 64 action sequences inside
-its model, keeps the 8 best, draws the next 64 around them, three times, and does the first 5 actions
-of the best sequence in the real world; then it plans again, starting from its last plan moved on 5
-steps. A sequence scores 1 if it reaches success, plus a little for reaching it sooner, else 0.
-Each try gets k + 20 steps.
+nearer the goal, the easier. They come from demos 150 to 199, which the demo-trained model never
+saw. A planner, the cross-entropy method, tries 64 action sequences inside its model, keeps the 8
+best, draws the next 64 around them, three times, and does the first 5 actions of the best sequence
+in the real world; then it plans again, starting from its last plan moved on 5 steps. A sequence
+scores 1 if it reaches success, plus a little for reaching it sooner, else 0. Each try gets k + 20
+steps.
 
 The model is either the true world itself (the known-answer check: how far back planning with this
 reward can reach at all) or a trained world model, which imagines each plan by feeding its predicted
@@ -35,6 +36,7 @@ from sim import Sim
 from world_model import WorldModel
 
 DEMOS = Path(__file__).resolve().parent.parent / "data" / "robomimic" / "square_ph"
+HELD_OUT = range(150, 200)                            # the demos the demo-trained model never saw
 KS = (5, 10, 15, 30)
 SAMPLES, ELITES, ROUNDS = 64, 8, 3
 DO_BEFORE_REPLANNING = 5
@@ -163,7 +165,8 @@ def one_try(task):
 
 
 def main(per_k, checkpoint=None):
-    steps = [s for s in success_steps() if s is not None]
+    found = success_steps()
+    steps = [found[i] for i in HELD_OUT if found[i] is not None]
     tasks = [(step, k, 1000 * k + i, checkpoint) for k in KS for i, step in enumerate(steps[:per_k])]
     with Pool(WORKERS) as pool:
         results = pool.map(one_try, tasks)
