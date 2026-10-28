@@ -1,0 +1,10 @@
+Planning with demo_trained.pt (20 demo starts per k):
+   k =  5: 18 of 20 tries succeeded. Planning calls: 43; the chosen plan imagined to succeed in 23, and of those it succeeded in the true world in 20; of the other 20, it succeeded anyway in 10
+   k = 10: 15 of 20 tries succeeded. Planning calls: 75; the chosen plan imagined to succeed in 32, and of those it succeeded in the true world in 20; of the other 43, it succeeded anyway in 18
+   k = 15: 15 of 20 tries succeeded. Planning calls: 86; the chosen plan imagined to succeed in 35, and of those it succeeded in the true world in 22; of the other 51, it succeeded anyway in 21
+   k = 30:  3 of 20 tries succeeded. Planning calls: 185; the chosen plan imagined to succeed in 82, and of those it succeeded in the true world in 17; of the other 103, it succeeded anyway in 5
+Planning with untrained.pt (20 demo starts per k):
+   k =  5: 18 of 20 tries succeeded. Planning calls: 65; the chosen plan imagined to succeed in 10, and of those it succeeded in the true world in 3; of the other 55, it succeeded anyway in 31
+   k = 10: 13 of 20 tries succeeded. Planning calls: 85; the chosen plan imagined to succeed in 11, and of those it succeeded in the true world in 5; of the other 74, it succeeded anyway in 33
+   k = 15: 10 of 20 tries succeeded. Planning calls: 111; the chosen plan imagined to succeed in 15, and of those it succeeded in the true world in 7; of the other 96, it succeeded anyway in 31
+   k = 30:  2 of 20 tries succeeded. Planning calls: 184; the chosen plan imagined to succeed in 11, and of those it succeeded in the true world in 0; of the other 173, it succeeded anyway in 15
